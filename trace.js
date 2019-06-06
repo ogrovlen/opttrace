@@ -1,5 +1,5 @@
 if(typeof exports == "undefined"){
-	exports = this;
+    exports = this;
 }
 
 function processTrace(trace)
@@ -10,12 +10,12 @@ function processTrace(trace)
     var select = null;
     var output = "";
     for (var i = 0; i < jsonTrace.steps.length; i++) {
-	if (jsonTrace.steps[i].join_optimization) {
-	    output += "select#" +
-		jsonTrace.steps[i].join_optimization["select#"] + ":\n";
+        if (jsonTrace.steps[i].join_optimization) {
+            output += "select#" +
+                jsonTrace.steps[i].join_optimization["select#"] + ":\n";
             optSteps = jsonTrace.steps[i].join_optimization.steps;
-	    output = processSelect(optSteps, output);
-	    output += "\n";
+            output = processSelect(optSteps, output);
+            output += "\n";
         }
     }
     return output;
@@ -25,21 +25,21 @@ function processSelect(optSteps, output)
 {
     var execPlans = null;
     for (var i = 0; i < optSteps.length; i++) {
-       if (optSteps[i].considered_execution_plans) {
-          execPlans = optSteps[i].considered_execution_plans;
-          break;
+        if (optSteps[i].considered_execution_plans) {
+            execPlans = optSteps[i].considered_execution_plans;
+            break;
         }
     }
- 
+
     if (!execPlans) return output;
-    
+
     output += "Table AccessType:IndexName Rows/Cost TotalRows/TotalCost\n";
     output += "--------------------------------------------------------\n";
     // List const tables first
     for (var i = 0; i < execPlans[0].plan_prefix.length; i++)
-	output += "(" + execPlans[0].plan_prefix[i] + " const)\n";
+        output += "(" + execPlans[0].plan_prefix[i] + " const)\n";
     for (var i=0; i < execPlans.length; i++) {
-        output = processTable(execPlans[i], output, 0); 
+        output = processTable(execPlans[i], output, 0);
     }
 
     return output;
@@ -57,9 +57,9 @@ function processTable(trace, output, indent)
 
     // Indentation level for table
     for (var i=0; i < indent; i++) output += " ";
-    
+
     output += trace.table;
-    
+
     // Find the chosen access path.  TODO: Handle index merge etc.
     if ("best_access_path" in trace) {
         var accessPath = trace.best_access_path.considered_access_paths;
@@ -94,16 +94,16 @@ function processTable(trace, output, indent)
         }
     }
     output += " " + trace.rows_for_plan + '/' + trace.cost_for_plan;
-    
+
     if (trace.added_to_eq_ref_extension) output += " eq_ref-extended";
-    
+
     // Semi-join strategies
-    sj_strategy = trace.semijoin_strategy_choice; 
+    sj_strategy = trace.semijoin_strategy_choice;
     if (sj_strategy) {
         for (var i = 0; i < sj_strategy.length; i++) {
             if (i == 0) output += " Semijoin(";
             else output += " ";
-            
+
             switch (sj_strategy[i].strategy) {
             case "FirstMatch":
                 output += "FM:";
@@ -124,7 +124,7 @@ function processTable(trace, output, indent)
                 output += "DW:";
                 break;
             }
-            output += sj_strategy[i].rows + "/" + sj_strategy[i].cost; 
+            output += sj_strategy[i].rows + "/" + sj_strategy[i].cost;
         }  // for-loop
         if (sj_strategy.length > 0) output += ")";
     } // if sj_strategy
