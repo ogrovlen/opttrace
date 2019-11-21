@@ -31,7 +31,10 @@ function processSelect(optSteps, output)
         }
     }
 
-    if (!execPlans) return output;
+    if (!execPlans || execPlans == "...") {
+        output += "No trace for greedy search!\n";
+        return output;
+    }
 
     output += "Table AccessType:IndexName Rows/Cost TotalRows/TotalCost\n";
     output += "--------------------------------------------------------\n";
