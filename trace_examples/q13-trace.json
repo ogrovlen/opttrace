@@ -1,0 +1,467 @@
+{
+  "steps": [
+    {
+      "join_preparation": {
+        "select#": 1,
+        "steps": [
+          {
+            "join_preparation": {
+              "select#": 2,
+              "steps": [
+                {
+                  "expanded_query": "/* select#2 */ select `customer`.`c_custkey` AS `c_custkey`,count(`orders`.`o_orderkey`) AS `c_count` from (`customer` left join `orders` on(((`customer`.`c_custkey` = `orders`.`o_custkey`) and (not((`orders`.`o_comment` like '%express%requests%')))))) group by `customer`.`c_custkey`"
+                }
+              ]
+            }
+          },
+          {
+            "derived": {
+              "table": " `c_orders`",
+              "select#": 2,
+              "materialized": true
+            }
+          },
+          {
+            "expanded_query": "/* select#1 */ select `c_orders`.`c_count` AS `c_count`,count(0) AS `custdist` from (/* select#2 */ select `customer`.`c_custkey` AS `c_custkey`,count(`orders`.`o_orderkey`) AS `c_count` from (`customer` left join `orders` on(((`customer`.`c_custkey` = `orders`.`o_custkey`) and (not((`orders`.`o_comment` like '%express%requests%')))))) group by `customer`.`c_custkey`) `c_orders` group by `c_orders`.`c_count` order by `custdist` desc,`c_orders`.`c_count` desc"
+          },
+          {
+            "transformations_to_nested_joins": {
+              "transformations": [
+                "parenthesis_removal"
+              ],
+              "expanded_query": "/* select#2 */ select `customer`.`c_custkey` AS `c_custkey`,count(`orders`.`o_orderkey`) AS `c_count` from `customer` left join `orders` on(((`customer`.`c_custkey` = `orders`.`o_custkey`) and (not((`orders`.`o_comment` like '%express%requests%'))))) group by `customer`.`c_custkey`"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "join_optimization": {
+        "select#": 1,
+        "steps": [
+          {
+            "join_optimization": {
+              "select#": 2,
+              "steps": [
+                {
+                  "condition_processing": {
+                    "condition": "WHERE",
+                    "original_condition": null,
+                    "steps": [
+                      {
+                        "transformation": "equality_propagation",
+                        "resulting_condition": null
+                      }
+                    ]
+                  }
+                },
+                {
+                  "substitute_generated_columns": {
+                  }
+                },
+                {
+                  "table_dependencies": [
+                    {
+                      "table": "`customer`",
+                      "row_may_be_null": false,
+                      "map_bit": 0,
+                      "depends_on_map_bits": [
+                      ]
+                    },
+                    {
+                      "table": "`orders`",
+                      "row_may_be_null": true,
+                      "map_bit": 1,
+                      "depends_on_map_bits": [
+                        0
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "ref_optimizer_key_uses": [
+                    {
+                      "table": "`orders`",
+                      "field": "o_custkey",
+                      "equals": "`customer`.`c_custkey`",
+                      "null_rejecting": false
+                    }
+                  ]
+                },
+                {
+                  "rows_estimation": [
+                    {
+                      "table": "`customer`",
+                      "const_keys_added": {
+                        "keys": [
+                          "PRIMARY",
+                          "i_c_nationkey"
+                        ],
+                        "cause": "group_by"
+                      },
+                      "range_analysis": {
+                        "table_scan": {
+                          "rows": 150000,
+                          "cost": 15443
+                        },
+                        "potential_range_indexes": [
+                          {
+                            "index": "PRIMARY",
+                            "usable": true,
+                            "key_parts": [
+                              "c_custkey"
+                            ]
+                          },
+                          {
+                            "index": "i_c_nationkey",
+                            "usable": true,
+                            "key_parts": [
+                              "c_nationkey",
+                              "c_custkey"
+                            ]
+                          }
+                        ],
+                        "best_covering_index_scan": {
+                          "index": "i_c_nationkey",
+                          "cost": 15041,
+                          "chosen": true
+                        },
+                        "group_index_range": {
+                          "chosen": false,
+                          "cause": "not_single_table"
+                        },
+                        "skip_scan_range": {
+                          "chosen": false,
+                          "cause": "not_single_table"
+                        }
+                      }
+                    },
+                    {
+                      "table": "`orders`",
+                      "table_scan": {
+                        "rows": 1500000,
+                        "cost": 2971.2
+                      }
+                    }
+                  ]
+                },
+                {
+                  "considered_execution_plans": [
+                    {
+                      "plan_prefix": [
+                      ],
+                      "table": "`customer`",
+                      "best_access_path": {
+                        "considered_access_paths": [
+                          {
+                            "rows_to_scan": 150000,
+                            "filtering_effect": [
+                            ],
+                            "final_filtering_effect": 1,
+                            "access_type": "scan",
+                            "resulting_rows": 150000,
+                            "cost": 15441,
+                            "chosen": true,
+                            "use_tmp_table": true
+                          }
+                        ]
+                      },
+                      "condition_filtering_pct": 100,
+                      "rows_for_plan": 150000,
+                      "cost_for_plan": 15441,
+                      "rest_of_plan": [
+                        {
+                          "plan_prefix": [
+                            "`customer`"
+                          ],
+                          "table": "`orders`",
+                          "best_access_path": {
+                            "considered_access_paths": [
+                              {
+                                "access_type": "ref",
+                                "index": "i_o_custkey",
+                                "rows": 15.001,
+                                "cost": 787531,
+                                "chosen": true
+                              },
+                              {
+                                "rows_to_scan": 1500000,
+                                "filtering_effect": [
+                                ],
+                                "final_filtering_effect": 1,
+                                "access_type": "scan",
+                                "using_join_cache": true,
+                                "buffers_needed": 1,
+                                "resulting_rows": 1.5e6,
+                                "cost": 2.3e10,
+                                "chosen": false
+                              }
+                            ]
+                          },
+                          "condition_filtering_pct": 100,
+                          "rows_for_plan": 2.25e6,
+                          "cost_for_plan": 802972,
+                          "sort_cost": 2.25e6,
+                          "new_cost_for_plan": 3.05e6,
+                          "chosen": true
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "condition_on_constant_tables": "1",
+                  "condition_value": true
+                },
+                {
+                  "attaching_conditions_to_tables": {
+                    "original_condition": "1",
+                    "attached_conditions_computation": [
+                    ],
+                    "attached_conditions_summary": [
+                      {
+                        "table": "`customer`",
+                        "attached": null
+                      },
+                      {
+                        "table": "`orders`",
+                        "attached": "<if>(is_not_null_compl(orders), (not((`orders`.`o_comment` like '%express%requests%'))), true)"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "optimizing_distinct_group_by_order_by": {
+                    "simplifying_group_by": {
+                      "original_clause": "`customer`.`c_custkey`",
+                      "items": [
+                        {
+                          "item": "`customer`.`c_custkey`"
+                        }
+                      ],
+                      "resulting_clause_is_simple": true,
+                      "resulting_clause": "`customer`.`c_custkey`"
+                    }
+                  }
+                },
+                {
+                  "reconsidering_access_paths_for_index_ordering": {
+                    "clause": "GROUP BY",
+                    "index_order_summary": {
+                      "table": "`customer`",
+                      "index_provides_order": true,
+                      "order_direction": "asc",
+                      "index": "PRIMARY",
+                      "plan_changed": true,
+                      "access_type": "index"
+                    }
+                  }
+                },
+                {
+                  "refine_plan": [
+                    {
+                      "table": "`customer`"
+                    },
+                    {
+                      "table": "`orders`"
+                    }
+                  ]
+                },
+                {
+                  "considering_tmp_tables": [
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "substitute_generated_columns": {
+            }
+          },
+          {
+            "table_dependencies": [
+              {
+                "table": " `c_orders`",
+                "row_may_be_null": false,
+                "map_bit": 0,
+                "depends_on_map_bits": [
+                ]
+              }
+            ]
+          },
+          {
+            "rows_estimation": [
+              {
+                "table": " `c_orders`",
+                "table_scan": {
+                  "rows": 2250089,
+                  "cost": 28129
+                }
+              }
+            ]
+          },
+          {
+            "considered_execution_plans": [
+              {
+                "plan_prefix": [
+                ],
+                "table": " `c_orders`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "rows_to_scan": 2250089,
+                      "access_type": "scan",
+                      "resulting_rows": 2.25e6,
+                      "cost": 253138,
+                      "chosen": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 2.25e6,
+                "cost_for_plan": 253138,
+                "chosen": true
+              }
+            ]
+          },
+          {
+            "attaching_conditions_to_tables": {
+              "original_condition": null,
+              "attached_conditions_computation": [
+              ],
+              "attached_conditions_summary": [
+                {
+                  "table": " `c_orders`",
+                  "attached": null
+                }
+              ]
+            }
+          },
+          {
+            "optimizing_distinct_group_by_order_by": {
+              "simplifying_order_by": {
+                "original_clause": "`custdist` desc,`c_orders`.`c_count` desc",
+                "items": [
+                  {
+                    "item": "count(0)"
+                  },
+                  {
+                    "item": "`c_orders`.`c_count`"
+                  }
+                ],
+                "resulting_clause_is_simple": false,
+                "resulting_clause": "`custdist` desc,`c_orders`.`c_count` desc"
+              },
+              "simplifying_group_by": {
+                "original_clause": "`c_orders`.`c_count`",
+                "items": [
+                  {
+                    "item": "`c_orders`.`c_count`"
+                  }
+                ],
+                "resulting_clause_is_simple": true,
+                "resulting_clause": "`c_orders`.`c_count`"
+              }
+            }
+          },
+          {
+            "refine_plan": [
+              {
+                "table": " `c_orders`"
+              }
+            ]
+          },
+          {
+            "considering_tmp_tables": [
+              {
+                "adding_tmp_table_in_plan_at_position": 1,
+                "write_method": "continuously_update_group_row"
+              },
+              {
+                "adding_sort_to_table_in_plan_at_position": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "join_execution": {
+        "select#": 1,
+        "steps": [
+          {
+            "creating_tmp_table": {
+              "tmp_table_info": {
+                "table": " `c_orders`",
+                "in_plan_at_position": 0,
+                "columns": 2,
+                "row_length": 13,
+                "key_length": 0,
+                "unique_constraint": false,
+                "makes_grouped_rows": false,
+                "cannot_insert_duplicates": false,
+                "location": "TempTable"
+              }
+            }
+          },
+          {
+            "join_execution": {
+              "select#": 2,
+              "steps": [
+              ]
+            }
+          },
+          {
+            "creating_tmp_table": {
+              "tmp_table_info": {
+                "table": "intermediate_tmp_table",
+                "in_plan_at_position": 1,
+                "columns": 2,
+                "row_length": 17,
+                "key_length": 8,
+                "unique_constraint": false,
+                "makes_grouped_rows": true,
+                "cannot_insert_duplicates": false,
+                "location": "TempTable"
+              }
+            }
+          },
+          {
+            "sorting_table_in_plan_at_position": 1,
+            "filesort_information": [
+              {
+                "direction": "desc",
+                "table": "intermediate_tmp_table",
+                "field": "custdist"
+              },
+              {
+                "direction": "desc",
+                "table": "intermediate_tmp_table",
+                "field": "c_count"
+              }
+            ],
+            "filesort_priority_queue_optimization": {
+              "usable": false,
+              "cause": "not applicable (no LIMIT)"
+            },
+            "filesort_execution": [
+            ],
+            "filesort_summary": {
+              "memory_available": 262144,
+              "key_size": 24,
+              "row_size": 24,
+              "max_rows_per_buffer": 52,
+              "num_rows_estimate": 52,
+              "num_rows_found": 42,
+              "num_initial_chunks_spilled_to_disk": 0,
+              "peak_memory_used": 33280,
+              "sort_algorithm": "std::sort",
+              "unpacked_addon_fields": "using_heap_table",
+              "sort_mode": "<fixed_sort_key, rowid>"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

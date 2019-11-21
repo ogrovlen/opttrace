@@ -1,0 +1,656 @@
+{
+  "steps": [
+    {
+      "join_preparation": {
+        "select#": 1,
+        "steps": [
+          {
+            "IN_uses_bisection": true
+          },
+          {
+            "join_preparation": {
+              "select#": 2,
+              "steps": [
+                {
+                  "expanded_query": "/* select#2 */ select `supplier`.`s_suppkey` from `supplier` where (`supplier`.`s_comment` like '%Customer%Complaints%')"
+                },
+                {
+                  "transformation": {
+                    "select#": 2,
+                    "from": "IN (SELECT)",
+                    "to": "semijoin",
+                    "chosen": false
+                  }
+                },
+                {
+                  "transformation": {
+                    "select#": 2,
+                    "from": "IN (SELECT)",
+                    "to": "EXISTS (CORRELATED SELECT)",
+                    "chosen": true,
+                    "evaluating_constant_where_conditions": [
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "expanded_query": "/* select#1 */ select `part`.`p_brand` AS `p_brand`,`part`.`p_type` AS `p_type`,`part`.`p_size` AS `p_size`,count(distinct `partsupp`.`ps_suppkey`) AS `supplier_cnt` from `partsupp` join `part` where ((`part`.`p_partkey` = `partsupp`.`ps_partkey`) and (`part`.`p_brand` <> 'Brand#23') and (not((`part`.`p_type` like 'LARGE PLATED%'))) and (`part`.`p_size` in (43,1,25,5,35,12,42,40)) and (not(<in_optimizer>(`partsupp`.`ps_suppkey`,<exists>(/* select#2 */ select `supplier`.`s_suppkey` from `supplier` where ((`supplier`.`s_comment` like '%Customer%Complaints%') and (<cache>(`partsupp`.`ps_suppkey`) = `supplier`.`s_suppkey`))))))) group by `part`.`p_brand`,`part`.`p_type`,`part`.`p_size` order by `supplier_cnt` desc,`part`.`p_brand`,`part`.`p_type`,`part`.`p_size`"
+          }
+        ]
+      }
+    },
+    {
+      "join_optimization": {
+        "select#": 1,
+        "steps": [
+          {
+            "condition_processing": {
+              "condition": "WHERE",
+              "original_condition": "((`part`.`p_partkey` = `partsupp`.`ps_partkey`) and (`part`.`p_brand` <> 'Brand#23') and (not((`part`.`p_type` like 'LARGE PLATED%'))) and (`part`.`p_size` in (43,1,25,5,35,12,42,40)) and (not(<in_optimizer>(`partsupp`.`ps_suppkey`,<exists>(/* select#2 */ select `supplier`.`s_suppkey` from `supplier` where ((`supplier`.`s_comment` like '%Customer%Complaints%') and (<cache>(`partsupp`.`ps_suppkey`) = `supplier`.`s_suppkey`)))))))",
+              "steps": [
+                {
+                  "transformation": "equality_propagation",
+                  "subselect_evaluation": [
+                  ],
+                  "resulting_condition": "((`part`.`p_brand` <> 'Brand#23') and (not((`part`.`p_type` like 'LARGE PLATED%'))) and (`part`.`p_size` in (43,1,25,5,35,12,42,40)) and (not(<in_optimizer>(`partsupp`.`ps_suppkey`,<exists>(/* select#2 */ select `supplier`.`s_suppkey` from `supplier` where ((`supplier`.`s_comment` like '%Customer%Complaints%') and (<cache>(`partsupp`.`ps_suppkey`) = `supplier`.`s_suppkey`)))))) and multiple equal(`part`.`p_partkey`, `partsupp`.`ps_partkey`))"
+                },
+                {
+                  "transformation": "constant_propagation",
+                  "subselect_evaluation": [
+                  ],
+                  "resulting_condition": "((`part`.`p_brand` <> 'Brand#23') and (not((`part`.`p_type` like 'LARGE PLATED%'))) and (`part`.`p_size` in (43,1,25,5,35,12,42,40)) and (not(<in_optimizer>(`partsupp`.`ps_suppkey`,<exists>(/* select#2 */ select `supplier`.`s_suppkey` from `supplier` where ((`supplier`.`s_comment` like '%Customer%Complaints%') and (<cache>(`partsupp`.`ps_suppkey`) = `supplier`.`s_suppkey`)))))) and multiple equal(`part`.`p_partkey`, `partsupp`.`ps_partkey`))"
+                },
+                {
+                  "transformation": "trivial_condition_removal",
+                  "subselect_evaluation": [
+                  ],
+                  "resulting_condition": "((`part`.`p_brand` <> 'Brand#23') and (not((`part`.`p_type` like 'LARGE PLATED%'))) and (`part`.`p_size` in (43,1,25,5,35,12,42,40)) and (not(<in_optimizer>(`partsupp`.`ps_suppkey`,<exists>(/* select#2 */ select `supplier`.`s_suppkey` from `supplier` where ((`supplier`.`s_comment` like '%Customer%Complaints%') and (<cache>(`partsupp`.`ps_suppkey`) = `supplier`.`s_suppkey`)))))) and multiple equal(`part`.`p_partkey`, `partsupp`.`ps_partkey`))"
+                }
+              ]
+            }
+          },
+          {
+            "substitute_generated_columns": {
+            }
+          },
+          {
+            "table_dependencies": [
+              {
+                "table": "`partsupp`",
+                "row_may_be_null": false,
+                "map_bit": 0,
+                "depends_on_map_bits": [
+                ]
+              },
+              {
+                "table": "`part`",
+                "row_may_be_null": false,
+                "map_bit": 1,
+                "depends_on_map_bits": [
+                ]
+              }
+            ]
+          },
+          {
+            "ref_optimizer_key_uses": [
+              {
+                "table": "`partsupp`",
+                "field": "ps_partkey",
+                "equals": "`part`.`p_partkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`partsupp`",
+                "field": "ps_partkey",
+                "equals": "`part`.`p_partkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`part`",
+                "field": "p_partkey",
+                "equals": "`partsupp`.`ps_partkey`",
+                "null_rejecting": false
+              }
+            ]
+          },
+          {
+            "rows_estimation": [
+              {
+                "table": "`partsupp`",
+                "table_scan": {
+                  "rows": 800000,
+                  "cost": 4814.3
+                }
+              },
+              {
+                "table": "`part`",
+                "table_scan": {
+                  "rows": 200000,
+                  "cost": 489
+                }
+              }
+            ]
+          },
+          {
+            "considered_execution_plans": [
+              {
+                "plan_prefix": [
+                ],
+                "table": "`part`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "access_type": "ref",
+                      "index": "PRIMARY",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "rows_to_scan": 200000,
+                      "filtering_effect": [
+                      ],
+                      "final_filtering_effect": 0.4,
+                      "access_type": "scan",
+                      "resulting_rows": 80001,
+                      "cost": 20489,
+                      "chosen": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 80001,
+                "cost_for_plan": 20489,
+                "rest_of_plan": [
+                  {
+                    "plan_prefix": [
+                      "`part`"
+                    ],
+                    "table": "`partsupp`",
+                    "best_access_path": {
+                      "considered_access_paths": [
+                        {
+                          "access_type": "ref",
+                          "index": "PRIMARY",
+                          "rows": 4,
+                          "cost": 62764,
+                          "chosen": true
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "i_ps_partkey",
+                          "rows": 4,
+                          "cost": 52088,
+                          "chosen": true
+                        },
+                        {
+                          "access_type": "scan",
+                          "chosen": false,
+                          "cause": "covering_index_better_than_full_scan"
+                        }
+                      ]
+                    },
+                    "condition_filtering_pct": 100,
+                    "rows_for_plan": 320004,
+                    "cost_for_plan": 72577,
+                    "chosen": true
+                  }
+                ]
+              },
+              {
+                "plan_prefix": [
+                ],
+                "table": "`partsupp`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "access_type": "ref",
+                      "index": "PRIMARY",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "access_type": "ref",
+                      "index": "i_ps_partkey",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "rows_to_scan": 800000,
+                      "filtering_effect": [
+                      ],
+                      "final_filtering_effect": 1,
+                      "access_type": "scan",
+                      "resulting_rows": 800000,
+                      "cost": 84814,
+                      "chosen": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 800000,
+                "cost_for_plan": 84814,
+                "pruned_by_cost": true
+              }
+            ]
+          },
+          {
+            "attaching_conditions_to_tables": {
+              "original_condition": "((`partsupp`.`ps_partkey` = `part`.`p_partkey`) and (`part`.`p_brand` <> 'Brand#23') and (not((`part`.`p_type` like 'LARGE PLATED%'))) and (`part`.`p_size` in (43,1,25,5,35,12,42,40)) and (not(<in_optimizer>(`partsupp`.`ps_suppkey`,<exists>(/* select#2 */ select `supplier`.`s_suppkey` from `supplier` where ((`supplier`.`s_comment` like '%Customer%Complaints%') and (<cache>(`partsupp`.`ps_suppkey`) = `supplier`.`s_suppkey`)))))))",
+              "attached_conditions_computation": [
+              ],
+              "attached_conditions_summary": [
+                {
+                  "table": "`part`",
+                  "attached": "((`part`.`p_brand` <> 'Brand#23') and (not((`part`.`p_type` like 'LARGE PLATED%'))) and (`part`.`p_size` in (43,1,25,5,35,12,42,40)))"
+                },
+                {
+                  "table": "`partsupp`",
+                  "attached": "(not(<in_optimizer>(`partsupp`.`ps_suppkey`,<exists>(/* select#2 */ select `supplier`.`s_suppkey` from `supplier` where ((`supplier`.`s_comment` like '%Customer%Complaints%') and (<cache>(`partsupp`.`ps_suppkey`) = `supplier`.`s_suppkey`))))))"
+                }
+              ]
+            }
+          },
+          {
+            "optimizing_distinct_group_by_order_by": {
+              "simplifying_order_by": {
+                "original_clause": "`supplier_cnt` desc,`part`.`p_brand`,`part`.`p_type`,`part`.`p_size`",
+                "items": [
+                  {
+                    "item": "count(distinct `partsupp`.`ps_suppkey`)"
+                  },
+                  {
+                    "item": "`part`.`p_brand`"
+                  },
+                  {
+                    "item": "`part`.`p_type`"
+                  },
+                  {
+                    "item": "`part`.`p_size`"
+                  }
+                ],
+                "resulting_clause_is_simple": false,
+                "resulting_clause": "`supplier_cnt` desc,`part`.`p_brand`,`part`.`p_type`,`part`.`p_size`"
+              },
+              "simplifying_group_by": {
+                "original_clause": "`part`.`p_brand`,`part`.`p_type`,`part`.`p_size`",
+                "items": [
+                  {
+                    "item": "`part`.`p_brand`"
+                  },
+                  {
+                    "item": "`part`.`p_type`"
+                  },
+                  {
+                    "item": "`part`.`p_size`"
+                  }
+                ],
+                "resulting_clause_is_simple": true,
+                "resulting_clause": "`part`.`p_brand`,`part`.`p_type`,`part`.`p_size`"
+              }
+            }
+          },
+          {
+            "refine_plan": [
+              {
+                "table": "`part`"
+              },
+              {
+                "table": "`partsupp`"
+              }
+            ]
+          },
+          {
+            "considering_tmp_tables": [
+              {
+                "adding_tmp_table_in_plan_at_position": 2,
+                "filesort": {
+                  "adding_sort_to_table_in_plan_at_position": 0
+                },
+                "unknown_key_1": {
+                  "creating_tmp_table": {
+                    "tmp_table_info": {
+                      "table": "intermediate_tmp_table",
+                      "columns": 1,
+                      "row_length": 5,
+                      "key_length": 4,
+                      "unique_constraint": false,
+                      "makes_grouped_rows": false,
+                      "cannot_insert_duplicates": true,
+                      "location": "TempTable"
+                    }
+                  }
+                },
+                "write_method": "write_group_row_when_complete"
+              },
+              {
+                "adding_sort_to_table_in_plan_at_position": 2
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "join_optimization": {
+        "select#": 2,
+        "steps": [
+          {
+            "condition_processing": {
+              "condition": "WHERE",
+              "original_condition": "((`supplier`.`s_comment` like '%Customer%Complaints%') and (<cache>(`partsupp`.`ps_suppkey`) = `supplier`.`s_suppkey`))",
+              "steps": [
+                {
+                  "transformation": "equality_propagation",
+                  "resulting_condition": "((`supplier`.`s_comment` like '%Customer%Complaints%') and (<cache>(`partsupp`.`ps_suppkey`) = `supplier`.`s_suppkey`))"
+                },
+                {
+                  "transformation": "constant_propagation",
+                  "resulting_condition": "((`supplier`.`s_comment` like '%Customer%Complaints%') and (<cache>(`partsupp`.`ps_suppkey`) = `supplier`.`s_suppkey`))"
+                },
+                {
+                  "transformation": "trivial_condition_removal",
+                  "resulting_condition": "((`supplier`.`s_comment` like '%Customer%Complaints%') and (<cache>(`partsupp`.`ps_suppkey`) = `supplier`.`s_suppkey`))"
+                }
+              ]
+            }
+          },
+          {
+            "substitute_generated_columns": {
+            }
+          },
+          {
+            "table_dependencies": [
+              {
+                "table": "`supplier`",
+                "row_may_be_null": false,
+                "map_bit": 0,
+                "depends_on_map_bits": [
+                ]
+              }
+            ]
+          },
+          {
+            "ref_optimizer_key_uses": [
+              {
+                "table": "`supplier`",
+                "field": "s_suppkey",
+                "equals": "<cache>(`partsupp`.`ps_suppkey`)",
+                "null_rejecting": false
+              }
+            ]
+          },
+          {
+            "rows_estimation": [
+              {
+                "table": "`supplier`",
+                "table_scan": {
+                  "rows": 10000,
+                  "cost": 40.25
+                }
+              }
+            ]
+          },
+          {
+            "considered_execution_plans": [
+              {
+                "plan_prefix": [
+                ],
+                "table": "`supplier`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "access_type": "eq_ref",
+                      "index": "PRIMARY",
+                      "rows": 1,
+                      "cost": 0.35,
+                      "chosen": true,
+                      "cause": "clustered_pk_chosen_by_heuristics"
+                    },
+                    {
+                      "access_type": "scan",
+                      "cost": 1040.2,
+                      "rows": 10000,
+                      "chosen": false,
+                      "cause": "cost"
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 11.11,
+                "rows_for_plan": 0.1111,
+                "cost_for_plan": 0.35,
+                "chosen": true
+              }
+            ]
+          },
+          {
+            "transformation": {
+              "select#": 2,
+              "from": "IN (SELECT)",
+              "to": "materialization",
+              "has_nullable_expressions": false,
+              "treat_UNKNOWN_as_FALSE": false,
+              "possible": true
+            }
+          },
+          {
+            "execution_plan_for_potential_materialization": {
+              "steps": [
+                {
+                  "considered_execution_plans": [
+                    {
+                      "plan_prefix": [
+                      ],
+                      "table": "`supplier`",
+                      "best_access_path": {
+                        "considered_access_paths": [
+                          {
+                            "access_type": "ref",
+                            "index": "PRIMARY",
+                            "usable": false,
+                            "chosen": false
+                          },
+                          {
+                            "rows_to_scan": 10000,
+                            "filtering_effect": [
+                            ],
+                            "final_filtering_effect": 0.1111,
+                            "access_type": "scan",
+                            "resulting_rows": 1111,
+                            "cost": 1040.2,
+                            "chosen": true
+                          }
+                        ]
+                      },
+                      "condition_filtering_pct": 100,
+                      "rows_for_plan": 1111,
+                      "cost_for_plan": 1040.2,
+                      "chosen": true
+                    }
+                  ]
+                }
+              ],
+              "subq_mat_decision": {
+                "parent_fanouts": [
+                  {
+                    "select#": 1,
+                    "subq_attached_to_table": true,
+                    "table": "`partsupp`",
+                    "fanout": 320004,
+                    "cacheable": true
+                  }
+                ],
+                "cost_to_create_and_fill_materialized_table": 1152.3,
+                "cost_of_one_EXISTS": 0.349,
+                "number_of_subquery_evaluations": 320004,
+                "cost_of_materialization": 33153,
+                "cost_of_EXISTS": 111681,
+                "chosen": true
+              }
+            }
+          },
+          {
+            "transformation": {
+              "select#": 2,
+              "from": "IN (SELECT)",
+              "to": "materialization",
+              "chosen": true,
+              "unknown_key_2": {
+                "creating_tmp_table": {
+                  "tmp_table_info": {
+                    "columns": 1,
+                    "row_length": 5,
+                    "key_length": 4,
+                    "unique_constraint": false,
+                    "makes_grouped_rows": false,
+                    "cannot_insert_duplicates": true,
+                    "location": "TempTable"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "attaching_conditions_to_tables": {
+              "original_condition": "(`supplier`.`s_comment` like '%Customer%Complaints%')",
+              "attached_conditions_computation": [
+              ],
+              "attached_conditions_summary": [
+                {
+                  "table": "`supplier`",
+                  "attached": "(`supplier`.`s_comment` like '%Customer%Complaints%')"
+                }
+              ]
+            }
+          },
+          {
+            "refine_plan": [
+              {
+                "table": "`supplier`"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "join_execution": {
+        "select#": 1,
+        "steps": [
+          {
+            "sorting_table_in_plan_at_position": 0,
+            "filesort_information": [
+              {
+                "direction": "asc",
+                "table": "`part`",
+                "field": "p_brand"
+              },
+              {
+                "direction": "asc",
+                "table": "`part`",
+                "field": "p_type"
+              },
+              {
+                "direction": "asc",
+                "table": "`part`",
+                "field": "p_size"
+              }
+            ],
+            "filesort_priority_queue_optimization": {
+              "usable": false,
+              "cause": "not applicable (no LIMIT)"
+            },
+            "filesort_execution": [
+            ],
+            "filesort_summary": {
+              "memory_available": 262144,
+              "key_size": 42,
+              "row_size": 90,
+              "max_rows_per_buffer": 2912,
+              "num_rows_estimate": 797081,
+              "num_rows_found": 29679,
+              "num_initial_chunks_spilled_to_disk": 11,
+              "peak_memory_used": 272680,
+              "sort_algorithm": "std::stable_sort",
+              "sort_mode": "<fixed_sort_key, packed_additional_fields>"
+            }
+          },
+          {
+            "subselect_execution": {
+              "select#": 2,
+              "steps": [
+                {
+                  "join_execution": {
+                    "select#": 2,
+                    "steps": [
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "creating_tmp_table": {
+              "tmp_table_info": {
+                "table": "intermediate_tmp_table",
+                "in_plan_at_position": 2,
+                "columns": 4,
+                "row_length": 49,
+                "key_length": 0,
+                "unique_constraint": false,
+                "makes_grouped_rows": false,
+                "cannot_insert_duplicates": false,
+                "location": "TempTable"
+              }
+            }
+          },
+          {
+            "sorting_table_in_plan_at_position": 2,
+            "filesort_information": [
+              {
+                "direction": "desc",
+                "table": "intermediate_tmp_table",
+                "field": "supplier_cnt"
+              },
+              {
+                "direction": "asc",
+                "table": "intermediate_tmp_table",
+                "field": "p_brand"
+              },
+              {
+                "direction": "asc",
+                "table": "intermediate_tmp_table",
+                "field": "p_type"
+              },
+              {
+                "direction": "asc",
+                "table": "intermediate_tmp_table",
+                "field": "p_size"
+              }
+            ],
+            "filesort_priority_queue_optimization": {
+              "usable": false,
+              "cause": "not applicable (no LIMIT)"
+            },
+            "filesort_execution": [
+            ],
+            "filesort_summary": {
+              "memory_available": 262144,
+              "key_size": 58,
+              "row_size": 58,
+              "max_rows_per_buffer": 4519,
+              "num_rows_estimate": 18297,
+              "num_rows_found": 18287,
+              "num_initial_chunks_spilled_to_disk": 5,
+              "peak_memory_used": 262144,
+              "sort_algorithm": "std::stable_sort",
+              "unpacked_addon_fields": "using_heap_table",
+              "sort_mode": "<fixed_sort_key, rowid>"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

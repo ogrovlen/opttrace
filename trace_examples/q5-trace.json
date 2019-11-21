@@ -1,0 +1,3172 @@
+{
+  "steps": [
+    {
+      "join_preparation": {
+        "select#": 1,
+        "steps": [
+          {
+            "expanded_query": "/* select#1 */ select `nation`.`n_name` AS `n_name`,sum((`lineitem`.`l_extendedprice` * (1 - `lineitem`.`l_discount`))) AS `revenue` from `customer` join `orders` join `lineitem` join `supplier` join `nation` join `region` where ((`customer`.`c_custkey` = `orders`.`o_custkey`) and (`lineitem`.`l_orderkey` = `orders`.`o_orderkey`) and (`lineitem`.`l_suppkey` = `supplier`.`s_suppkey`) and (`customer`.`c_nationkey` = `supplier`.`s_nationkey`) and (`supplier`.`s_nationkey` = `nation`.`n_nationkey`) and (`nation`.`n_regionkey` = `region`.`r_regionkey`) and (`region`.`r_name` = 'AFRICA') and (`orders`.`o_orderDATE` >= '1994-01-01') and (`orders`.`o_orderDATE` < ('1994-01-01' + interval '1' year))) group by `nation`.`n_name` order by `revenue` desc"
+          }
+        ]
+      }
+    },
+    {
+      "join_optimization": {
+        "select#": 1,
+        "steps": [
+          {
+            "condition_processing": {
+              "condition": "WHERE",
+              "original_condition": "((`customer`.`c_custkey` = `orders`.`o_custkey`) and (`lineitem`.`l_orderkey` = `orders`.`o_orderkey`) and (`lineitem`.`l_suppkey` = `supplier`.`s_suppkey`) and (`customer`.`c_nationkey` = `supplier`.`s_nationkey`) and (`supplier`.`s_nationkey` = `nation`.`n_nationkey`) and (`nation`.`n_regionkey` = `region`.`r_regionkey`) and (`region`.`r_name` = 'AFRICA') and (`orders`.`o_orderDATE` >= '1994-01-01') and (`orders`.`o_orderDATE` < ('1994-01-01' + interval '1' year)))",
+              "steps": [
+                {
+                  "transformation": "equality_propagation",
+                  "resulting_condition": "((`orders`.`o_orderDATE` >= '1994-01-01') and (`orders`.`o_orderDATE` < ('1994-01-01' + interval '1' year)) and multiple equal(`customer`.`c_custkey`, `orders`.`o_custkey`) and multiple equal(`lineitem`.`l_orderkey`, `orders`.`o_orderkey`) and multiple equal(`lineitem`.`l_suppkey`, `supplier`.`s_suppkey`) and multiple equal(`customer`.`c_nationkey`, `supplier`.`s_nationkey`, `nation`.`n_nationkey`) and multiple equal(`nation`.`n_regionkey`, `region`.`r_regionkey`) and multiple equal('AFRICA', `region`.`r_name`))"
+                },
+                {
+                  "transformation": "constant_propagation",
+                  "resulting_condition": "((`orders`.`o_orderDATE` >= '1994-01-01') and (`orders`.`o_orderDATE` < ('1994-01-01' + interval '1' year)) and multiple equal(`customer`.`c_custkey`, `orders`.`o_custkey`) and multiple equal(`lineitem`.`l_orderkey`, `orders`.`o_orderkey`) and multiple equal(`lineitem`.`l_suppkey`, `supplier`.`s_suppkey`) and multiple equal(`customer`.`c_nationkey`, `supplier`.`s_nationkey`, `nation`.`n_nationkey`) and multiple equal(`nation`.`n_regionkey`, `region`.`r_regionkey`) and multiple equal('AFRICA', `region`.`r_name`))"
+                },
+                {
+                  "transformation": "trivial_condition_removal",
+                  "resulting_condition": "((`orders`.`o_orderDATE` >= '1994-01-01') and (`orders`.`o_orderDATE` < ('1994-01-01' + interval '1' year)) and multiple equal(`customer`.`c_custkey`, `orders`.`o_custkey`) and multiple equal(`lineitem`.`l_orderkey`, `orders`.`o_orderkey`) and multiple equal(`lineitem`.`l_suppkey`, `supplier`.`s_suppkey`) and multiple equal(`customer`.`c_nationkey`, `supplier`.`s_nationkey`, `nation`.`n_nationkey`) and multiple equal(`nation`.`n_regionkey`, `region`.`r_regionkey`) and multiple equal('AFRICA', `region`.`r_name`))"
+                }
+              ]
+            }
+          },
+          {
+            "substitute_generated_columns": {
+            }
+          },
+          {
+            "table_dependencies": [
+              {
+                "table": "`customer`",
+                "row_may_be_null": false,
+                "map_bit": 0,
+                "depends_on_map_bits": [
+                ]
+              },
+              {
+                "table": "`orders`",
+                "row_may_be_null": false,
+                "map_bit": 1,
+                "depends_on_map_bits": [
+                ]
+              },
+              {
+                "table": "`lineitem`",
+                "row_may_be_null": false,
+                "map_bit": 2,
+                "depends_on_map_bits": [
+                ]
+              },
+              {
+                "table": "`supplier`",
+                "row_may_be_null": false,
+                "map_bit": 3,
+                "depends_on_map_bits": [
+                ]
+              },
+              {
+                "table": "`nation`",
+                "row_may_be_null": false,
+                "map_bit": 4,
+                "depends_on_map_bits": [
+                ]
+              },
+              {
+                "table": "`region`",
+                "row_may_be_null": false,
+                "map_bit": 5,
+                "depends_on_map_bits": [
+                ]
+              }
+            ]
+          },
+          {
+            "ref_optimizer_key_uses": [
+              {
+                "table": "`customer`",
+                "field": "c_custkey",
+                "equals": "`orders`.`o_custkey`",
+                "null_rejecting": true
+              },
+              {
+                "table": "`customer`",
+                "field": "c_nationkey",
+                "equals": "`nation`.`n_nationkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`customer`",
+                "field": "c_nationkey",
+                "equals": "`supplier`.`s_nationkey`",
+                "null_rejecting": true
+              },
+              {
+                "table": "`customer`",
+                "field": "c_custkey",
+                "equals": "`orders`.`o_custkey`",
+                "null_rejecting": true
+              },
+              {
+                "table": "`orders`",
+                "field": "o_orderkey",
+                "equals": "`lineitem`.`l_orderkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`orders`",
+                "field": "o_custkey",
+                "equals": "`customer`.`c_custkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`orders`",
+                "field": "o_orderkey",
+                "equals": "`lineitem`.`l_orderkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`lineitem`",
+                "field": "l_orderkey",
+                "equals": "`orders`.`o_orderkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`lineitem`",
+                "field": "l_suppkey",
+                "equals": "`supplier`.`s_suppkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`lineitem`",
+                "field": "l_orderkey",
+                "equals": "`orders`.`o_orderkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`lineitem`",
+                "field": "l_orderkey",
+                "equals": "`orders`.`o_orderkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`lineitem`",
+                "field": "l_orderkey",
+                "equals": "`orders`.`o_orderkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`supplier`",
+                "field": "s_suppkey",
+                "equals": "`lineitem`.`l_suppkey`",
+                "null_rejecting": true
+              },
+              {
+                "table": "`supplier`",
+                "field": "s_nationkey",
+                "equals": "`customer`.`c_nationkey`",
+                "null_rejecting": true
+              },
+              {
+                "table": "`supplier`",
+                "field": "s_nationkey",
+                "equals": "`nation`.`n_nationkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`supplier`",
+                "field": "s_suppkey",
+                "equals": "`lineitem`.`l_suppkey`",
+                "null_rejecting": true
+              },
+              {
+                "table": "`nation`",
+                "field": "n_nationkey",
+                "equals": "`customer`.`c_nationkey`",
+                "null_rejecting": true
+              },
+              {
+                "table": "`nation`",
+                "field": "n_nationkey",
+                "equals": "`supplier`.`s_nationkey`",
+                "null_rejecting": true
+              },
+              {
+                "table": "`nation`",
+                "field": "n_regionkey",
+                "equals": "`region`.`r_regionkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`nation`",
+                "field": "n_nationkey",
+                "equals": "`customer`.`c_nationkey`",
+                "null_rejecting": true
+              },
+              {
+                "table": "`nation`",
+                "field": "n_nationkey",
+                "equals": "`supplier`.`s_nationkey`",
+                "null_rejecting": true
+              },
+              {
+                "table": "`region`",
+                "field": "r_regionkey",
+                "equals": "`nation`.`n_regionkey`",
+                "null_rejecting": true
+              }
+            ]
+          },
+          {
+            "rows_estimation": [
+              {
+                "table": "`customer`",
+                "table_scan": {
+                  "rows": 150000,
+                  "cost": 441
+                }
+              },
+              {
+                "table": "`orders`",
+                "range_analysis": {
+                  "table_scan": {
+                    "rows": 1500000,
+                    "cost": 152973
+                  },
+                  "potential_range_indexes": [
+                    {
+                      "index": "PRIMARY",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_o_orderdate",
+                      "usable": true,
+                      "key_parts": [
+                        "o_orderDATE",
+                        "o_orderkey"
+                      ]
+                    },
+                    {
+                      "index": "i_o_custkey",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    }
+                  ],
+                  "setup_range_conditions": [
+                  ],
+                  "group_index_range": {
+                    "chosen": false,
+                    "cause": "not_single_table"
+                  },
+                  "skip_scan_range": {
+                    "chosen": false,
+                    "cause": "not_single_table"
+                  },
+                  "analyzing_range_alternatives": {
+                    "range_scan_alternatives": [
+                      {
+                        "index": "i_o_orderdate",
+                        "ranges": [
+                          "0x21940f <= o_orderDATE < 0x21960f"
+                        ],
+                        "index_dives_for_eq_ranges": true,
+                        "rowid_ordered": false,
+                        "using_mrr": false,
+                        "index_only": false,
+                        "rows": 460900,
+                        "cost": 161315,
+                        "chosen": false,
+                        "cause": "cost"
+                      }
+                    ],
+                    "analyzing_roworder_intersect": {
+                      "usable": false,
+                      "cause": "too_few_roworder_scans"
+                    }
+                  }
+                }
+              },
+              {
+                "table": "`lineitem`",
+                "table_scan": {
+                  "rows": 6001215,
+                  "cost": 12901
+                }
+              },
+              {
+                "table": "`supplier`",
+                "table_scan": {
+                  "rows": 10000,
+                  "cost": 40.25
+                }
+              },
+              {
+                "table": "`nation`",
+                "table_scan": {
+                  "rows": 25,
+                  "cost": 0.25
+                }
+              },
+              {
+                "table": "`region`",
+                "table_scan": {
+                  "rows": 5,
+                  "cost": 0.25
+                }
+              }
+            ]
+          },
+          {
+            "considered_execution_plans": [
+              {
+                "plan_prefix": [
+                ],
+                "table": "`region`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "access_type": "ref",
+                      "index": "PRIMARY",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "rows_to_scan": 5,
+                      "filtering_effect": [
+                      ],
+                      "final_filtering_effect": 0.2,
+                      "access_type": "scan",
+                      "resulting_rows": 1,
+                      "cost": 0.75,
+                      "chosen": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 1,
+                "cost_for_plan": 0.75,
+                "rest_of_plan": [
+                  {
+                    "plan_prefix": [
+                      "`region`"
+                    ],
+                    "table": "`nation`",
+                    "best_access_path": {
+                      "considered_access_paths": [
+                        {
+                          "access_type": "ref",
+                          "index": "PRIMARY",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "i_n_regionkey",
+                          "rows": 5,
+                          "cost": 1.125,
+                          "chosen": true
+                        },
+                        {
+                          "rows_to_scan": 25,
+                          "filtering_effect": [
+                          ],
+                          "final_filtering_effect": 1,
+                          "access_type": "scan",
+                          "using_join_cache": true,
+                          "buffers_needed": 1,
+                          "resulting_rows": 25,
+                          "cost": 2.75,
+                          "chosen": false
+                        }
+                      ]
+                    },
+                    "condition_filtering_pct": 100,
+                    "rows_for_plan": 5,
+                    "cost_for_plan": 1.875,
+                    "rest_of_plan": [
+                      {
+                        "plan_prefix": [
+                          "`region`",
+                          "`nation`"
+                        ],
+                        "table": "`supplier`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_s_nationkey",
+                              "rows": 400,
+                              "cost": 201.8,
+                              "chosen": true
+                            },
+                            {
+                              "access_type": "scan",
+                              "cost": 1040.2,
+                              "rows": 10000,
+                              "chosen": false,
+                              "cause": "cost"
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 2000,
+                        "cost_for_plan": 203.67,
+                        "rest_of_plan": [
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`nation`",
+                              "`supplier`"
+                            ],
+                            "table": "`customer`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "PRIMARY",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_c_nationkey",
+                                  "rows": 6000,
+                                  "cost": 1.2e6,
+                                  "chosen": true
+                                },
+                                {
+                                  "access_type": "scan",
+                                  "chosen": false,
+                                  "cause": "covering_index_better_than_full_scan"
+                                }
+                              ]
+                            },
+                            "condition_filtering_pct": 100,
+                            "rows_for_plan": 1.2e7,
+                            "cost_for_plan": 1.2e6,
+                            "rest_of_plan": [
+                              {
+                                "plan_prefix": [
+                                  "`region`",
+                                  "`nation`",
+                                  "`supplier`",
+                                  "`customer`"
+                                ],
+                                "table": "`orders`",
+                                "best_access_path": {
+                                  "considered_access_paths": [
+                                    {
+                                      "access_type": "ref",
+                                      "index": "PRIMARY",
+                                      "usable": false,
+                                      "chosen": false
+                                    },
+                                    {
+                                      "access_type": "ref",
+                                      "index": "i_o_custkey",
+                                      "rows": 15.001,
+                                      "cost": 6.3e7,
+                                      "chosen": true
+                                    },
+                                    {
+                                      "rows_to_scan": 1500000,
+                                      "filtering_effect": [
+                                      ],
+                                      "final_filtering_effect": 0.3073,
+                                      "access_type": "scan",
+                                      "using_join_cache": true,
+                                      "buffers_needed": 235,
+                                      "resulting_rows": 460900,
+                                      "cost": 5.5e11,
+                                      "chosen": false
+                                    }
+                                  ]
+                                },
+                                "condition_filtering_pct": 30.727,
+                                "rows_for_plan": 5.53e7,
+                                "cost_for_plan": 6.42e7,
+                                "rest_of_plan": [
+                                  {
+                                    "plan_prefix": [
+                                      "`region`",
+                                      "`nation`",
+                                      "`supplier`",
+                                      "`customer`",
+                                      "`orders`"
+                                    ],
+                                    "table": "`lineitem`",
+                                    "best_access_path": {
+                                      "considered_access_paths": [
+                                        {
+                                          "access_type": "ref",
+                                          "index": "PRIMARY",
+                                          "rows": 4.0008,
+                                          "cost": 3.61e7,
+                                          "chosen": true
+                                        },
+                                        {
+                                          "access_type": "ref",
+                                          "index": "i_l_suppkey",
+                                          "rows": 1.0002,
+                                          "cost": 1.94e7,
+                                          "chosen": true
+                                        },
+                                        {
+                                          "access_type": "ref",
+                                          "index": "i_l_orderkey",
+                                          "rows": 4.0008,
+                                          "cost": 7.75e7,
+                                          "chosen": false
+                                        },
+                                        {
+                                          "access_type": "ref",
+                                          "index": "i_l_orderkey_quantity",
+                                          "rows": 4.0008,
+                                          "cost": 7.75e7,
+                                          "chosen": false
+                                        },
+                                        {
+                                          "rows_to_scan": 6001215,
+                                          "filtering_effect": [
+                                          ],
+                                          "final_filtering_effect": 1,
+                                          "access_type": "scan",
+                                          "using_join_cache": true,
+                                          "buffers_needed": 1240,
+                                          "resulting_rows": 6e6,
+                                          "cost": 3.3e13,
+                                          "chosen": false
+                                        }
+                                      ]
+                                    },
+                                    "condition_filtering_pct": 100,
+                                    "rows_for_plan": 5.53e7,
+                                    "cost_for_plan": 8.36e7,
+                                    "chosen": true
+                                  }
+                                ]
+                              },
+                              {
+                                "plan_prefix": [
+                                  "`region`",
+                                  "`nation`",
+                                  "`supplier`",
+                                  "`customer`"
+                                ],
+                                "table": "`lineitem`",
+                                "best_access_path": {
+                                  "considered_access_paths": [
+                                    {
+                                      "access_type": "ref",
+                                      "index": "PRIMARY",
+                                      "usable": false,
+                                      "chosen": false
+                                    },
+                                    {
+                                      "access_type": "ref",
+                                      "index": "i_l_suppkey",
+                                      "rows": 600.12,
+                                      "cost": 2.52e9,
+                                      "chosen": true
+                                    },
+                                    {
+                                      "access_type": "ref",
+                                      "index": "i_l_orderkey",
+                                      "usable": false,
+                                      "chosen": false
+                                    },
+                                    {
+                                      "access_type": "ref",
+                                      "index": "i_l_orderkey_quantity",
+                                      "usable": false,
+                                      "chosen": false
+                                    },
+                                    {
+                                      "rows_to_scan": 6001215,
+                                      "filtering_effect": [
+                                      ],
+                                      "final_filtering_effect": 1,
+                                      "access_type": "scan",
+                                      "using_join_cache": true,
+                                      "buffers_needed": 235,
+                                      "resulting_rows": 6e6,
+                                      "cost": 7.2e12,
+                                      "chosen": false
+                                    }
+                                  ]
+                                },
+                                "condition_filtering_pct": 100,
+                                "rows_for_plan": 7.2e9,
+                                "cost_for_plan": 2.52e9,
+                                "pruned_by_cost": true
+                              }
+                            ]
+                          },
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`nation`",
+                              "`supplier`"
+                            ],
+                            "table": "`orders`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "PRIMARY",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_o_custkey",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "rows_to_scan": 1500000,
+                                  "filtering_effect": [
+                                  ],
+                                  "final_filtering_effect": 0.3073,
+                                  "access_type": "scan",
+                                  "using_join_cache": true,
+                                  "buffers_needed": 1,
+                                  "resulting_rows": 460900,
+                                  "cost": 9.23e7,
+                                  "chosen": true
+                                }
+                              ]
+                            },
+                            "condition_filtering_pct": 100,
+                            "rows_for_plan": 9.22e8,
+                            "cost_for_plan": 9.23e7,
+                            "pruned_by_cost": true
+                          },
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`nation`",
+                              "`supplier`"
+                            ],
+                            "table": "`lineitem`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "PRIMARY",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_suppkey",
+                                  "rows": 600.12,
+                                  "cost": 420190,
+                                  "chosen": true
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_orderkey",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_orderkey_quantity",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "rows_to_scan": 6001215,
+                                  "filtering_effect": [
+                                  ],
+                                  "final_filtering_effect": 1,
+                                  "access_type": "scan",
+                                  "using_join_cache": true,
+                                  "buffers_needed": 1,
+                                  "resulting_rows": 6e6,
+                                  "cost": 1.2e9,
+                                  "chosen": false
+                                }
+                              ]
+                            },
+                            "condition_filtering_pct": 100,
+                            "rows_for_plan": 1.2e6,
+                            "cost_for_plan": 420394,
+                            "rest_of_plan": [
+                              {
+                                "plan_prefix": [
+                                  "`region`",
+                                  "`nation`",
+                                  "`supplier`",
+                                  "`lineitem`"
+                                ],
+                                "table": "`customer`",
+                                "best_access_path": {
+                                  "considered_access_paths": [
+                                    {
+                                      "access_type": "ref",
+                                      "index": "PRIMARY",
+                                      "usable": false,
+                                      "chosen": false
+                                    },
+                                    {
+                                      "access_type": "ref",
+                                      "index": "i_c_nationkey",
+                                      "rows": 6000,
+                                      "cost": 7.22e8,
+                                      "chosen": true
+                                    },
+                                    {
+                                      "access_type": "scan",
+                                      "chosen": false,
+                                      "cause": "covering_index_better_than_full_scan"
+                                    }
+                                  ]
+                                },
+                                "condition_filtering_pct": 100,
+                                "rows_for_plan": 7.2e9,
+                                "cost_for_plan": 7.23e8,
+                                "pruned_by_cost": true
+                              },
+                              {
+                                "plan_prefix": [
+                                  "`region`",
+                                  "`nation`",
+                                  "`supplier`",
+                                  "`lineitem`"
+                                ],
+                                "table": "`orders`",
+                                "best_access_path": {
+                                  "considered_access_paths": [
+                                    {
+                                      "access_type": "eq_ref",
+                                      "index": "PRIMARY",
+                                      "rows": 1,
+                                      "cost": 420085,
+                                      "chosen": true,
+                                      "cause": "clustered_pk_chosen_by_heuristics"
+                                    },
+                                    {
+                                      "rows_to_scan": 1500000,
+                                      "filtering_effect": [
+                                      ],
+                                      "final_filtering_effect": 0.3073,
+                                      "access_type": "scan",
+                                      "using_join_cache": true,
+                                      "buffers_needed": 27,
+                                      "resulting_rows": 460900,
+                                      "cost": 5.5e10,
+                                      "chosen": false
+                                    }
+                                  ]
+                                },
+                                "condition_filtering_pct": 30.727,
+                                "rows_for_plan": 368795,
+                                "cost_for_plan": 840479,
+                                "rest_of_plan": [
+                                  {
+                                    "plan_prefix": [
+                                      "`region`",
+                                      "`nation`",
+                                      "`supplier`",
+                                      "`lineitem`",
+                                      "`orders`"
+                                    ],
+                                    "table": "`customer`",
+                                    "best_access_path": {
+                                      "considered_access_paths": [
+                                        {
+                                          "access_type": "eq_ref",
+                                          "index": "PRIMARY",
+                                          "rows": 1,
+                                          "cost": 129078,
+                                          "chosen": true,
+                                          "cause": "clustered_pk_chosen_by_heuristics"
+                                        },
+                                        {
+                                          "access_type": "scan",
+                                          "chosen": false,
+                                          "cause": "covering_index_better_than_full_scan"
+                                        }
+                                      ]
+                                    },
+                                    "added_to_eq_ref_extension": false
+                                  },
+                                  {
+                                    "plan_prefix": [
+                                      "`region`",
+                                      "`nation`",
+                                      "`supplier`",
+                                      "`lineitem`",
+                                      "`orders`"
+                                    ],
+                                    "table": "`customer`",
+                                    "best_access_path": {
+                                      "considered_access_paths": [
+                                        {
+                                          "access_type": "eq_ref",
+                                          "index": "PRIMARY",
+                                          "rows": 1,
+                                          "cost": 129078,
+                                          "chosen": true,
+                                          "cause": "clustered_pk_chosen_by_heuristics"
+                                        },
+                                        {
+                                          "access_type": "scan",
+                                          "chosen": false,
+                                          "cause": "covering_index_better_than_full_scan"
+                                        }
+                                      ]
+                                    },
+                                    "condition_filtering_pct": 100,
+                                    "rows_for_plan": 368795,
+                                    "cost_for_plan": 969557,
+                                    "chosen": true
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "plan_prefix": [
+                          "`region`",
+                          "`nation`"
+                        ],
+                        "table": "`customer`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_c_nationkey",
+                              "rows": 6000,
+                              "cost": 3009.5,
+                              "chosen": true
+                            },
+                            {
+                              "access_type": "scan",
+                              "cost": 15441,
+                              "rows": 150000,
+                              "chosen": false,
+                              "cause": "cost"
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 30000,
+                        "cost_for_plan": 3011.4,
+                        "rest_of_plan": [
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`nation`",
+                              "`customer`"
+                            ],
+                            "table": "`supplier`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "PRIMARY",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_s_nationkey",
+                                  "rows": 400,
+                                  "cost": 1.21e6,
+                                  "chosen": true
+                                },
+                                {
+                                  "access_type": "scan",
+                                  "chosen": false,
+                                  "cause": "covering_index_better_than_full_scan"
+                                }
+                              ]
+                            },
+                            "condition_filtering_pct": 100,
+                            "rows_for_plan": 1.2e7,
+                            "cost_for_plan": 1.21e6,
+                            "pruned_by_cost": true
+                          },
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`nation`",
+                              "`customer`"
+                            ],
+                            "table": "`orders`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "PRIMARY",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_o_custkey",
+                                  "rows": 15.001,
+                                  "cost": 157506,
+                                  "chosen": true
+                                },
+                                {
+                                  "rows_to_scan": 1500000,
+                                  "filtering_effect": [
+                                  ],
+                                  "final_filtering_effect": 0.3073,
+                                  "access_type": "scan",
+                                  "using_join_cache": true,
+                                  "buffers_needed": 1,
+                                  "resulting_rows": 460900,
+                                  "cost": 1.38e9,
+                                  "chosen": false
+                                }
+                              ]
+                            },
+                            "condition_filtering_pct": 30.727,
+                            "rows_for_plan": 138276,
+                            "cost_for_plan": 160518,
+                            "rest_of_plan": [
+                              {
+                                "plan_prefix": [
+                                  "`region`",
+                                  "`nation`",
+                                  "`customer`",
+                                  "`orders`"
+                                ],
+                                "table": "`supplier`",
+                                "best_access_path": {
+                                  "considered_access_paths": [
+                                    {
+                                      "access_type": "ref",
+                                      "index": "PRIMARY",
+                                      "usable": false,
+                                      "chosen": false
+                                    },
+                                    {
+                                      "access_type": "ref",
+                                      "index": "i_s_nationkey",
+                                      "rows": 400,
+                                      "cost": 5.58e6,
+                                      "chosen": true
+                                    },
+                                    {
+                                      "access_type": "scan",
+                                      "chosen": false,
+                                      "cause": "covering_index_better_than_full_scan"
+                                    }
+                                  ]
+                                },
+                                "condition_filtering_pct": 100,
+                                "rows_for_plan": 5.53e7,
+                                "cost_for_plan": 5.74e6,
+                                "pruned_by_cost": true
+                              },
+                              {
+                                "plan_prefix": [
+                                  "`region`",
+                                  "`nation`",
+                                  "`customer`",
+                                  "`orders`"
+                                ],
+                                "table": "`lineitem`",
+                                "best_access_path": {
+                                  "considered_access_paths": [
+                                    {
+                                      "access_type": "ref",
+                                      "index": "PRIMARY",
+                                      "rows": 4.0008,
+                                      "cost": 90338,
+                                      "chosen": true
+                                    },
+                                    {
+                                      "access_type": "ref",
+                                      "index": "i_l_suppkey",
+                                      "usable": false,
+                                      "chosen": false
+                                    },
+                                    {
+                                      "access_type": "ref",
+                                      "index": "i_l_orderkey",
+                                      "rows": 4.0008,
+                                      "cost": 193673,
+                                      "chosen": false
+                                    },
+                                    {
+                                      "access_type": "ref",
+                                      "index": "i_l_orderkey_quantity",
+                                      "rows": 4.0008,
+                                      "cost": 193673,
+                                      "chosen": false
+                                    },
+                                    {
+                                      "rows_to_scan": 6001215,
+                                      "filtering_effect": [
+                                      ],
+                                      "final_filtering_effect": 1,
+                                      "access_type": "scan",
+                                      "using_join_cache": true,
+                                      "buffers_needed": 3,
+                                      "resulting_rows": 6e6,
+                                      "cost": 8.3e10,
+                                      "chosen": false
+                                    }
+                                  ]
+                                },
+                                "condition_filtering_pct": 100,
+                                "rows_for_plan": 553214,
+                                "cost_for_plan": 250856,
+                                "rest_of_plan": [
+                                  {
+                                    "plan_prefix": [
+                                      "`region`",
+                                      "`nation`",
+                                      "`customer`",
+                                      "`orders`",
+                                      "`lineitem`"
+                                    ],
+                                    "table": "`supplier`",
+                                    "best_access_path": {
+                                      "considered_access_paths": [
+                                        {
+                                          "access_type": "eq_ref",
+                                          "index": "PRIMARY",
+                                          "rows": 1,
+                                          "cost": 193625,
+                                          "chosen": true,
+                                          "cause": "clustered_pk_chosen_by_heuristics"
+                                        },
+                                        {
+                                          "access_type": "scan",
+                                          "chosen": false,
+                                          "cause": "covering_index_better_than_full_scan"
+                                        }
+                                      ]
+                                    },
+                                    "condition_filtering_pct": 100,
+                                    "rows_for_plan": 553214,
+                                    "cost_for_plan": 444481,
+                                    "chosen": true
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`nation`",
+                              "`customer`"
+                            ],
+                            "table": "`lineitem`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "PRIMARY",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_suppkey",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_orderkey",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_orderkey_quantity",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "rows_to_scan": 6001215,
+                                  "filtering_effect": [
+                                  ],
+                                  "final_filtering_effect": 1,
+                                  "access_type": "scan",
+                                  "using_join_cache": true,
+                                  "buffers_needed": 1,
+                                  "resulting_rows": 6e6,
+                                  "cost": 1.8e10,
+                                  "chosen": true
+                                }
+                              ]
+                            },
+                            "condition_filtering_pct": 100,
+                            "rows_for_plan": 1.8e11,
+                            "cost_for_plan": 1.8e10,
+                            "pruned_by_cost": true
+                          }
+                        ]
+                      },
+                      {
+                        "plan_prefix": [
+                          "`region`",
+                          "`nation`"
+                        ],
+                        "table": "`orders`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_o_custkey",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "rows_to_scan": 1500000,
+                              "filtering_effect": [
+                              ],
+                              "final_filtering_effect": 0.3073,
+                              "access_type": "scan",
+                              "using_join_cache": true,
+                              "buffers_needed": 1,
+                              "resulting_rows": 460900,
+                              "cost": 337339,
+                              "chosen": true
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 2.3e6,
+                        "cost_for_plan": 337341,
+                        "rest_of_plan": [
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`nation`",
+                              "`orders`"
+                            ],
+                            "table": "`supplier`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "PRIMARY",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_s_nationkey",
+                                  "rows": 400,
+                                  "cost": 9.3e7,
+                                  "chosen": true
+                                },
+                                {
+                                  "access_type": "scan",
+                                  "chosen": false,
+                                  "cause": "covering_index_better_than_full_scan"
+                                }
+                              ]
+                            },
+                            "condition_filtering_pct": 100,
+                            "rows_for_plan": 9.22e8,
+                            "cost_for_plan": 9.33e7,
+                            "pruned_by_cost": true
+                          },
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`nation`",
+                              "`orders`"
+                            ],
+                            "table": "`customer`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "eq_ref",
+                                  "index": "PRIMARY",
+                                  "rows": 1,
+                                  "cost": 345675,
+                                  "chosen": true,
+                                  "cause": "clustered_pk_chosen_by_heuristics"
+                                },
+                                {
+                                  "access_type": "scan",
+                                  "chosen": false,
+                                  "cause": "covering_index_better_than_full_scan"
+                                }
+                              ]
+                            },
+                            "condition_filtering_pct": 5,
+                            "rows_for_plan": 115225,
+                            "cost_for_plan": 683016,
+                            "pruned_by_cost": true
+                          },
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`nation`",
+                              "`orders`"
+                            ],
+                            "table": "`lineitem`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "PRIMARY",
+                                  "rows": 4.0008,
+                                  "cost": 1.51e6,
+                                  "chosen": true
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_suppkey",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_orderkey",
+                                  "rows": 4.0008,
+                                  "cost": 3.23e6,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_orderkey_quantity",
+                                  "rows": 4.0008,
+                                  "cost": 3.23e6,
+                                  "chosen": false
+                                },
+                                {
+                                  "rows_to_scan": 6001215,
+                                  "filtering_effect": [
+                                  ],
+                                  "final_filtering_effect": 1,
+                                  "access_type": "scan",
+                                  "using_join_cache": true,
+                                  "buffers_needed": 42,
+                                  "resulting_rows": 6e6,
+                                  "cost": 1.4e12,
+                                  "chosen": false
+                                }
+                              ]
+                            },
+                            "condition_filtering_pct": 100,
+                            "rows_for_plan": 9.22e6,
+                            "cost_for_plan": 1.84e6,
+                            "pruned_by_cost": true
+                          }
+                        ]
+                      },
+                      {
+                        "plan_prefix": [
+                          "`region`",
+                          "`nation`"
+                        ],
+                        "table": "`lineitem`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_l_suppkey",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_l_orderkey",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_l_orderkey_quantity",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "rows_to_scan": 6001215,
+                              "filtering_effect": [
+                              ],
+                              "final_filtering_effect": 1,
+                              "access_type": "scan",
+                              "using_join_cache": true,
+                              "buffers_needed": 1,
+                              "resulting_rows": 6e6,
+                              "cost": 3.01e6,
+                              "chosen": true
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 3e7,
+                        "cost_for_plan": 3.01e6,
+                        "pruned_by_cost": true
+                      }
+                    ]
+                  },
+                  {
+                    "plan_prefix": [
+                      "`region`"
+                    ],
+                    "table": "`supplier`",
+                    "best_access_path": {
+                      "considered_access_paths": [
+                        {
+                          "access_type": "ref",
+                          "index": "PRIMARY",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "i_s_nationkey",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "rows_to_scan": 10000,
+                          "filtering_effect": [
+                          ],
+                          "final_filtering_effect": 1,
+                          "access_type": "scan",
+                          "using_join_cache": true,
+                          "buffers_needed": 1,
+                          "resulting_rows": 10000,
+                          "cost": 1040.3,
+                          "chosen": true
+                        }
+                      ]
+                    },
+                    "condition_filtering_pct": 100,
+                    "rows_for_plan": 10000,
+                    "cost_for_plan": 1041,
+                    "rest_of_plan": [
+                      {
+                        "plan_prefix": [
+                          "`region`",
+                          "`supplier`"
+                        ],
+                        "table": "`nation`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "eq_ref",
+                              "index": "PRIMARY",
+                              "rows": 1,
+                              "cost": 3500,
+                              "chosen": true,
+                              "cause": "clustered_pk_chosen_by_heuristics"
+                            },
+                            {
+                              "rows_to_scan": 25,
+                              "filtering_effect": [
+                              ],
+                              "final_filtering_effect": 1,
+                              "access_type": "scan",
+                              "using_join_cache": true,
+                              "buffers_needed": 1,
+                              "resulting_rows": 25,
+                              "cost": 25000,
+                              "chosen": false
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 20,
+                        "rows_for_plan": 2000,
+                        "cost_for_plan": 4541,
+                        "rest_of_plan": [
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`supplier`",
+                              "`nation`"
+                            ],
+                            "table": "`customer`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "PRIMARY",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_c_nationkey",
+                                  "rows": 6000,
+                                  "cost": 1.2e6,
+                                  "chosen": true
+                                },
+                                {
+                                  "access_type": "scan",
+                                  "chosen": false,
+                                  "cause": "covering_index_better_than_full_scan"
+                                }
+                              ]
+                            },
+                            "added_to_eq_ref_extension": false
+                          },
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`supplier`",
+                              "`nation`"
+                            ],
+                            "table": "`lineitem`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "PRIMARY",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_suppkey",
+                                  "rows": 600.12,
+                                  "cost": 420190,
+                                  "chosen": true
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_orderkey",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_orderkey_quantity",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "rows_to_scan": 6001215,
+                                  "filtering_effect": [
+                                  ],
+                                  "final_filtering_effect": 1,
+                                  "access_type": "scan",
+                                  "using_join_cache": true,
+                                  "buffers_needed": 1,
+                                  "resulting_rows": 6e6,
+                                  "cost": 1.2e9,
+                                  "chosen": false
+                                }
+                              ]
+                            },
+                            "added_to_eq_ref_extension": false
+                          },
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`supplier`",
+                              "`nation`"
+                            ],
+                            "table": "`customer`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "PRIMARY",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_c_nationkey",
+                                  "rows": 6000,
+                                  "cost": 1.2e6,
+                                  "chosen": true
+                                },
+                                {
+                                  "access_type": "scan",
+                                  "chosen": false,
+                                  "cause": "covering_index_better_than_full_scan"
+                                }
+                              ]
+                            },
+                            "condition_filtering_pct": 100,
+                            "rows_for_plan": 1.2e7,
+                            "cost_for_plan": 1.21e6,
+                            "pruned_by_cost": true
+                          },
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`supplier`",
+                              "`nation`"
+                            ],
+                            "table": "`orders`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "PRIMARY",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_o_custkey",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "rows_to_scan": 1500000,
+                                  "filtering_effect": [
+                                  ],
+                                  "final_filtering_effect": 0.3073,
+                                  "access_type": "scan",
+                                  "using_join_cache": true,
+                                  "buffers_needed": 1,
+                                  "resulting_rows": 460900,
+                                  "cost": 9.23e7,
+                                  "chosen": true
+                                }
+                              ]
+                            },
+                            "condition_filtering_pct": 100,
+                            "rows_for_plan": 9.22e8,
+                            "cost_for_plan": 9.23e7,
+                            "pruned_by_cost": true
+                          },
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`supplier`",
+                              "`nation`"
+                            ],
+                            "table": "`lineitem`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "PRIMARY",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_suppkey",
+                                  "rows": 600.12,
+                                  "cost": 420190,
+                                  "chosen": true
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_orderkey",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_orderkey_quantity",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "rows_to_scan": 6001215,
+                                  "filtering_effect": [
+                                  ],
+                                  "final_filtering_effect": 1,
+                                  "access_type": "scan",
+                                  "using_join_cache": true,
+                                  "buffers_needed": 1,
+                                  "resulting_rows": 6e6,
+                                  "cost": 1.2e9,
+                                  "chosen": false
+                                }
+                              ]
+                            },
+                            "condition_filtering_pct": 100,
+                            "rows_for_plan": 1.2e6,
+                            "cost_for_plan": 424731,
+                            "rest_of_plan": [
+                              {
+                                "plan_prefix": [
+                                  "`region`",
+                                  "`supplier`",
+                                  "`nation`",
+                                  "`lineitem`"
+                                ],
+                                "table": "`customer`",
+                                "best_access_path": {
+                                  "considered_access_paths": [
+                                    {
+                                      "access_type": "ref",
+                                      "index": "PRIMARY",
+                                      "usable": false,
+                                      "chosen": false
+                                    },
+                                    {
+                                      "access_type": "ref",
+                                      "index": "i_c_nationkey",
+                                      "rows": 6000,
+                                      "cost": 7.22e8,
+                                      "chosen": true
+                                    },
+                                    {
+                                      "access_type": "scan",
+                                      "chosen": false,
+                                      "cause": "covering_index_better_than_full_scan"
+                                    }
+                                  ]
+                                },
+                                "condition_filtering_pct": 100,
+                                "rows_for_plan": 7.2e9,
+                                "cost_for_plan": 7.23e8,
+                                "pruned_by_cost": true
+                              },
+                              {
+                                "plan_prefix": [
+                                  "`region`",
+                                  "`supplier`",
+                                  "`nation`",
+                                  "`lineitem`"
+                                ],
+                                "table": "`orders`",
+                                "best_access_path": {
+                                  "considered_access_paths": [
+                                    {
+                                      "access_type": "eq_ref",
+                                      "index": "PRIMARY",
+                                      "rows": 1,
+                                      "cost": 420085,
+                                      "chosen": true,
+                                      "cause": "clustered_pk_chosen_by_heuristics"
+                                    },
+                                    {
+                                      "rows_to_scan": 1500000,
+                                      "filtering_effect": [
+                                      ],
+                                      "final_filtering_effect": 0.3073,
+                                      "access_type": "scan",
+                                      "using_join_cache": true,
+                                      "buffers_needed": 27,
+                                      "resulting_rows": 460900,
+                                      "cost": 5.5e10,
+                                      "chosen": false
+                                    }
+                                  ]
+                                },
+                                "condition_filtering_pct": 30.727,
+                                "rows_for_plan": 368795,
+                                "cost_for_plan": 844816,
+                                "pruned_by_cost": true
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "plan_prefix": [
+                          "`region`",
+                          "`supplier`"
+                        ],
+                        "table": "`customer`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_c_nationkey",
+                              "rows": 6000,
+                              "cost": 6.02e6,
+                              "chosen": true
+                            },
+                            {
+                              "access_type": "scan",
+                              "chosen": false,
+                              "cause": "covering_index_better_than_full_scan"
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 6e7,
+                        "cost_for_plan": 6.02e6,
+                        "pruned_by_cost": true
+                      },
+                      {
+                        "plan_prefix": [
+                          "`region`",
+                          "`supplier`"
+                        ],
+                        "table": "`orders`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_o_custkey",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "rows_to_scan": 1500000,
+                              "filtering_effect": [
+                              ],
+                              "final_filtering_effect": 0.3073,
+                              "access_type": "scan",
+                              "using_join_cache": true,
+                              "buffers_needed": 1,
+                              "resulting_rows": 460900,
+                              "cost": 4.61e8,
+                              "chosen": true
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 4.61e9,
+                        "cost_for_plan": 4.61e8,
+                        "pruned_by_cost": true
+                      },
+                      {
+                        "plan_prefix": [
+                          "`region`",
+                          "`supplier`"
+                        ],
+                        "table": "`lineitem`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_l_suppkey",
+                              "rows": 600.12,
+                              "cost": 2.1e6,
+                              "chosen": true
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_l_orderkey",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_l_orderkey_quantity",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "rows_to_scan": 6001215,
+                              "filtering_effect": [
+                              ],
+                              "final_filtering_effect": 1,
+                              "access_type": "scan",
+                              "using_join_cache": true,
+                              "buffers_needed": 1,
+                              "resulting_rows": 6e6,
+                              "cost": 6e9,
+                              "chosen": false
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 6e6,
+                        "cost_for_plan": 2.1e6,
+                        "pruned_by_cost": true
+                      }
+                    ]
+                  },
+                  {
+                    "plan_prefix": [
+                      "`region`"
+                    ],
+                    "table": "`customer`",
+                    "best_access_path": {
+                      "considered_access_paths": [
+                        {
+                          "access_type": "ref",
+                          "index": "PRIMARY",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "i_c_nationkey",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "rows_to_scan": 150000,
+                          "filtering_effect": [
+                          ],
+                          "final_filtering_effect": 1,
+                          "access_type": "scan",
+                          "using_join_cache": true,
+                          "buffers_needed": 1,
+                          "resulting_rows": 150000,
+                          "cost": 15441,
+                          "chosen": true
+                        }
+                      ]
+                    },
+                    "condition_filtering_pct": 100,
+                    "rows_for_plan": 150000,
+                    "cost_for_plan": 15442,
+                    "rest_of_plan": [
+                      {
+                        "plan_prefix": [
+                          "`region`",
+                          "`customer`"
+                        ],
+                        "table": "`nation`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "eq_ref",
+                              "index": "PRIMARY",
+                              "rows": 1,
+                              "cost": 52500,
+                              "chosen": true,
+                              "cause": "clustered_pk_chosen_by_heuristics"
+                            },
+                            {
+                              "rows_to_scan": 25,
+                              "filtering_effect": [
+                              ],
+                              "final_filtering_effect": 1,
+                              "access_type": "scan",
+                              "using_join_cache": true,
+                              "buffers_needed": 2,
+                              "resulting_rows": 25,
+                              "cost": 375001,
+                              "chosen": false
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 20,
+                        "rows_for_plan": 30000,
+                        "cost_for_plan": 67942,
+                        "rest_of_plan": [
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`customer`",
+                              "`nation`"
+                            ],
+                            "table": "`supplier`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "PRIMARY",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_s_nationkey",
+                                  "rows": 400,
+                                  "cost": 1.21e6,
+                                  "chosen": true
+                                },
+                                {
+                                  "access_type": "scan",
+                                  "chosen": false,
+                                  "cause": "covering_index_better_than_full_scan"
+                                }
+                              ]
+                            },
+                            "added_to_eq_ref_extension": false
+                          },
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`customer`",
+                              "`nation`"
+                            ],
+                            "table": "`orders`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "PRIMARY",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_o_custkey",
+                                  "rows": 15.001,
+                                  "cost": 157506,
+                                  "chosen": true
+                                },
+                                {
+                                  "rows_to_scan": 1500000,
+                                  "filtering_effect": [
+                                  ],
+                                  "final_filtering_effect": 0.3073,
+                                  "access_type": "scan",
+                                  "using_join_cache": true,
+                                  "buffers_needed": 1,
+                                  "resulting_rows": 460900,
+                                  "cost": 1.38e9,
+                                  "chosen": false
+                                }
+                              ]
+                            },
+                            "added_to_eq_ref_extension": false
+                          },
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`customer`",
+                              "`nation`"
+                            ],
+                            "table": "`supplier`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "PRIMARY",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_s_nationkey",
+                                  "rows": 400,
+                                  "cost": 1.21e6,
+                                  "chosen": true
+                                },
+                                {
+                                  "access_type": "scan",
+                                  "chosen": false,
+                                  "cause": "covering_index_better_than_full_scan"
+                                }
+                              ]
+                            },
+                            "condition_filtering_pct": 100,
+                            "rows_for_plan": 1.2e7,
+                            "cost_for_plan": 1.28e6,
+                            "pruned_by_cost": true
+                          },
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`customer`",
+                              "`nation`"
+                            ],
+                            "table": "`orders`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "PRIMARY",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_o_custkey",
+                                  "rows": 15.001,
+                                  "cost": 157506,
+                                  "chosen": true
+                                },
+                                {
+                                  "rows_to_scan": 1500000,
+                                  "filtering_effect": [
+                                  ],
+                                  "final_filtering_effect": 0.3073,
+                                  "access_type": "scan",
+                                  "using_join_cache": true,
+                                  "buffers_needed": 1,
+                                  "resulting_rows": 460900,
+                                  "cost": 1.38e9,
+                                  "chosen": false
+                                }
+                              ]
+                            },
+                            "condition_filtering_pct": 30.727,
+                            "rows_for_plan": 138276,
+                            "cost_for_plan": 225448,
+                            "rest_of_plan": [
+                              {
+                                "plan_prefix": [
+                                  "`region`",
+                                  "`customer`",
+                                  "`nation`",
+                                  "`orders`"
+                                ],
+                                "table": "`supplier`",
+                                "best_access_path": {
+                                  "considered_access_paths": [
+                                    {
+                                      "access_type": "ref",
+                                      "index": "PRIMARY",
+                                      "usable": false,
+                                      "chosen": false
+                                    },
+                                    {
+                                      "access_type": "ref",
+                                      "index": "i_s_nationkey",
+                                      "rows": 400,
+                                      "cost": 5.58e6,
+                                      "chosen": true
+                                    },
+                                    {
+                                      "access_type": "scan",
+                                      "chosen": false,
+                                      "cause": "covering_index_better_than_full_scan"
+                                    }
+                                  ]
+                                },
+                                "condition_filtering_pct": 100,
+                                "rows_for_plan": 5.53e7,
+                                "cost_for_plan": 5.81e6,
+                                "pruned_by_cost": true
+                              },
+                              {
+                                "plan_prefix": [
+                                  "`region`",
+                                  "`customer`",
+                                  "`nation`",
+                                  "`orders`"
+                                ],
+                                "table": "`lineitem`",
+                                "best_access_path": {
+                                  "considered_access_paths": [
+                                    {
+                                      "access_type": "ref",
+                                      "index": "PRIMARY",
+                                      "rows": 4.0008,
+                                      "cost": 90338,
+                                      "chosen": true
+                                    },
+                                    {
+                                      "access_type": "ref",
+                                      "index": "i_l_suppkey",
+                                      "usable": false,
+                                      "chosen": false
+                                    },
+                                    {
+                                      "access_type": "ref",
+                                      "index": "i_l_orderkey",
+                                      "rows": 4.0008,
+                                      "cost": 193673,
+                                      "chosen": false
+                                    },
+                                    {
+                                      "access_type": "ref",
+                                      "index": "i_l_orderkey_quantity",
+                                      "rows": 4.0008,
+                                      "cost": 193673,
+                                      "chosen": false
+                                    },
+                                    {
+                                      "rows_to_scan": 6001215,
+                                      "filtering_effect": [
+                                      ],
+                                      "final_filtering_effect": 1,
+                                      "access_type": "scan",
+                                      "using_join_cache": true,
+                                      "buffers_needed": 3,
+                                      "resulting_rows": 6e6,
+                                      "cost": 8.3e10,
+                                      "chosen": false
+                                    }
+                                  ]
+                                },
+                                "condition_filtering_pct": 100,
+                                "rows_for_plan": 553214,
+                                "cost_for_plan": 315786,
+                                "rest_of_plan": [
+                                  {
+                                    "plan_prefix": [
+                                      "`region`",
+                                      "`customer`",
+                                      "`nation`",
+                                      "`orders`",
+                                      "`lineitem`"
+                                    ],
+                                    "table": "`supplier`",
+                                    "best_access_path": {
+                                      "considered_access_paths": [
+                                        {
+                                          "access_type": "eq_ref",
+                                          "index": "PRIMARY",
+                                          "rows": 1,
+                                          "cost": 193625,
+                                          "chosen": true,
+                                          "cause": "clustered_pk_chosen_by_heuristics"
+                                        },
+                                        {
+                                          "access_type": "scan",
+                                          "chosen": false,
+                                          "cause": "covering_index_better_than_full_scan"
+                                        }
+                                      ]
+                                    },
+                                    "condition_filtering_pct": 100,
+                                    "rows_for_plan": 553214,
+                                    "cost_for_plan": 509411,
+                                    "pruned_by_cost": true
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`customer`",
+                              "`nation`"
+                            ],
+                            "table": "`lineitem`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "PRIMARY",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_suppkey",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_orderkey",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_orderkey_quantity",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "rows_to_scan": 6001215,
+                                  "filtering_effect": [
+                                  ],
+                                  "final_filtering_effect": 1,
+                                  "access_type": "scan",
+                                  "using_join_cache": true,
+                                  "buffers_needed": 1,
+                                  "resulting_rows": 6e6,
+                                  "cost": 1.8e10,
+                                  "chosen": true
+                                }
+                              ]
+                            },
+                            "condition_filtering_pct": 100,
+                            "rows_for_plan": 1.8e11,
+                            "cost_for_plan": 1.8e10,
+                            "pruned_by_cost": true
+                          }
+                        ]
+                      },
+                      {
+                        "plan_prefix": [
+                          "`region`",
+                          "`customer`"
+                        ],
+                        "table": "`supplier`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_s_nationkey",
+                              "rows": 400,
+                              "cost": 6.05e6,
+                              "chosen": true
+                            },
+                            {
+                              "access_type": "scan",
+                              "chosen": false,
+                              "cause": "covering_index_better_than_full_scan"
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 6e7,
+                        "cost_for_plan": 6.07e6,
+                        "pruned_by_cost": true
+                      },
+                      {
+                        "plan_prefix": [
+                          "`region`",
+                          "`customer`"
+                        ],
+                        "table": "`orders`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_o_custkey",
+                              "rows": 15.001,
+                              "cost": 787532,
+                              "chosen": true
+                            },
+                            {
+                              "rows_to_scan": 1500000,
+                              "filtering_effect": [
+                              ],
+                              "final_filtering_effect": 0.3073,
+                              "access_type": "scan",
+                              "using_join_cache": true,
+                              "buffers_needed": 2,
+                              "resulting_rows": 460900,
+                              "cost": 6.91e9,
+                              "chosen": false
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 30.727,
+                        "rows_for_plan": 691378,
+                        "cost_for_plan": 802973,
+                        "pruned_by_cost": true
+                      },
+                      {
+                        "plan_prefix": [
+                          "`region`",
+                          "`customer`"
+                        ],
+                        "table": "`lineitem`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_l_suppkey",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_l_orderkey",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_l_orderkey_quantity",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "rows_to_scan": 6001215,
+                              "filtering_effect": [
+                              ],
+                              "final_filtering_effect": 1,
+                              "access_type": "scan",
+                              "using_join_cache": true,
+                              "buffers_needed": 2,
+                              "resulting_rows": 6e6,
+                              "cost": 9e10,
+                              "chosen": true
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 9e11,
+                        "cost_for_plan": 9e10,
+                        "pruned_by_cost": true
+                      }
+                    ]
+                  },
+                  {
+                    "plan_prefix": [
+                      "`region`"
+                    ],
+                    "table": "`orders`",
+                    "best_access_path": {
+                      "considered_access_paths": [
+                        {
+                          "access_type": "ref",
+                          "index": "PRIMARY",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "i_o_custkey",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "rows_to_scan": 1500000,
+                          "filtering_effect": [
+                          ],
+                          "final_filtering_effect": 0.3073,
+                          "access_type": "scan",
+                          "using_join_cache": true,
+                          "buffers_needed": 1,
+                          "resulting_rows": 460900,
+                          "cost": 152972,
+                          "chosen": true
+                        }
+                      ]
+                    },
+                    "condition_filtering_pct": 100,
+                    "rows_for_plan": 460900,
+                    "cost_for_plan": 152973,
+                    "rest_of_plan": [
+                      {
+                        "plan_prefix": [
+                          "`region`",
+                          "`orders`"
+                        ],
+                        "table": "`nation`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_n_regionkey",
+                              "rows": 5,
+                              "cost": 518512,
+                              "chosen": true
+                            },
+                            {
+                              "rows_to_scan": 25,
+                              "filtering_effect": [
+                              ],
+                              "final_filtering_effect": 1,
+                              "access_type": "scan",
+                              "using_join_cache": true,
+                              "buffers_needed": 5,
+                              "resulting_rows": 25,
+                              "cost": 1.15e6,
+                              "chosen": false
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 2.3e6,
+                        "cost_for_plan": 671485,
+                        "pruned_by_cost": true
+                      },
+                      {
+                        "plan_prefix": [
+                          "`region`",
+                          "`orders`"
+                        ],
+                        "table": "`supplier`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_s_nationkey",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "rows_to_scan": 10000,
+                              "filtering_effect": [
+                              ],
+                              "final_filtering_effect": 1,
+                              "access_type": "scan",
+                              "using_join_cache": true,
+                              "buffers_needed": 5,
+                              "resulting_rows": 10000,
+                              "cost": 4.61e8,
+                              "chosen": true
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 4.61e9,
+                        "cost_for_plan": 4.61e8,
+                        "pruned_by_cost": true
+                      },
+                      {
+                        "plan_prefix": [
+                          "`region`",
+                          "`orders`"
+                        ],
+                        "table": "`customer`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "eq_ref",
+                              "index": "PRIMARY",
+                              "rows": 1,
+                              "cost": 161315,
+                              "chosen": true,
+                              "cause": "clustered_pk_chosen_by_heuristics"
+                            },
+                            {
+                              "access_type": "scan",
+                              "chosen": false,
+                              "cause": "covering_index_better_than_full_scan"
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 460900,
+                        "cost_for_plan": 314288,
+                        "rest_of_plan": [
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`orders`",
+                              "`customer`"
+                            ],
+                            "table": "`nation`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "eq_ref",
+                                  "index": "PRIMARY",
+                                  "rows": 1,
+                                  "cost": 161315,
+                                  "chosen": true,
+                                  "cause": "clustered_pk_chosen_by_heuristics"
+                                },
+                                {
+                                  "rows_to_scan": 25,
+                                  "filtering_effect": [
+                                  ],
+                                  "final_filtering_effect": 1,
+                                  "access_type": "scan",
+                                  "using_join_cache": true,
+                                  "buffers_needed": 6,
+                                  "resulting_rows": 25,
+                                  "cost": 1.15e6,
+                                  "chosen": false
+                                }
+                              ]
+                            },
+                            "added_to_eq_ref_extension": true,
+                            "condition_filtering_pct": 20,
+                            "rows_for_plan": 92180,
+                            "cost_for_plan": 475603,
+                            "pruned_by_cost": true
+                          },
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`orders`",
+                              "`customer`"
+                            ],
+                            "table": "`supplier`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "PRIMARY",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_s_nationkey",
+                                  "rows": 400,
+                                  "cost": 1.86e7,
+                                  "chosen": true
+                                },
+                                {
+                                  "access_type": "scan",
+                                  "chosen": false,
+                                  "cause": "covering_index_better_than_full_scan"
+                                }
+                              ]
+                            },
+                            "added_to_eq_ref_extension": false
+                          },
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`orders`",
+                              "`customer`"
+                            ],
+                            "table": "`lineitem`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "PRIMARY",
+                                  "rows": 4.0008,
+                                  "cost": 301116,
+                                  "chosen": true
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_suppkey",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_orderkey",
+                                  "rows": 4.0008,
+                                  "cost": 645552,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_orderkey_quantity",
+                                  "rows": 4.0008,
+                                  "cost": 645552,
+                                  "chosen": false
+                                },
+                                {
+                                  "rows_to_scan": 6001215,
+                                  "filtering_effect": [
+                                  ],
+                                  "final_filtering_effect": 1,
+                                  "access_type": "scan",
+                                  "using_join_cache": true,
+                                  "buffers_needed": 6,
+                                  "resulting_rows": 6e6,
+                                  "cost": 2.8e11,
+                                  "chosen": false
+                                }
+                              ]
+                            },
+                            "added_to_eq_ref_extension": false
+                          },
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`orders`",
+                              "`customer`"
+                            ],
+                            "table": "`nation`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "eq_ref",
+                                  "index": "PRIMARY",
+                                  "rows": 1,
+                                  "cost": 161315,
+                                  "chosen": true,
+                                  "cause": "clustered_pk_chosen_by_heuristics"
+                                },
+                                {
+                                  "rows_to_scan": 25,
+                                  "filtering_effect": [
+                                  ],
+                                  "final_filtering_effect": 1,
+                                  "access_type": "scan",
+                                  "using_join_cache": true,
+                                  "buffers_needed": 6,
+                                  "resulting_rows": 25,
+                                  "cost": 1.15e6,
+                                  "chosen": false
+                                }
+                              ]
+                            },
+                            "condition_filtering_pct": 20,
+                            "rows_for_plan": 92180,
+                            "cost_for_plan": 475603,
+                            "pruned_by_cost": true
+                          },
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`orders`",
+                              "`customer`"
+                            ],
+                            "table": "`supplier`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "PRIMARY",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_s_nationkey",
+                                  "rows": 400,
+                                  "cost": 1.86e7,
+                                  "chosen": true
+                                },
+                                {
+                                  "access_type": "scan",
+                                  "chosen": false,
+                                  "cause": "covering_index_better_than_full_scan"
+                                }
+                              ]
+                            },
+                            "condition_filtering_pct": 100,
+                            "rows_for_plan": 1.84e8,
+                            "cost_for_plan": 1.89e7,
+                            "pruned_by_cost": true
+                          },
+                          {
+                            "plan_prefix": [
+                              "`region`",
+                              "`orders`",
+                              "`customer`"
+                            ],
+                            "table": "`lineitem`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "ref",
+                                  "index": "PRIMARY",
+                                  "rows": 4.0008,
+                                  "cost": 301116,
+                                  "chosen": true
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_suppkey",
+                                  "usable": false,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_orderkey",
+                                  "rows": 4.0008,
+                                  "cost": 645552,
+                                  "chosen": false
+                                },
+                                {
+                                  "access_type": "ref",
+                                  "index": "i_l_orderkey_quantity",
+                                  "rows": 4.0008,
+                                  "cost": 645552,
+                                  "chosen": false
+                                },
+                                {
+                                  "rows_to_scan": 6001215,
+                                  "filtering_effect": [
+                                  ],
+                                  "final_filtering_effect": 1,
+                                  "access_type": "scan",
+                                  "using_join_cache": true,
+                                  "buffers_needed": 6,
+                                  "resulting_rows": 6e6,
+                                  "cost": 2.8e11,
+                                  "chosen": false
+                                }
+                              ]
+                            },
+                            "condition_filtering_pct": 100,
+                            "rows_for_plan": 1.84e6,
+                            "cost_for_plan": 615403,
+                            "pruned_by_cost": true
+                          }
+                        ]
+                      },
+                      {
+                        "plan_prefix": [
+                          "`region`",
+                          "`orders`"
+                        ],
+                        "table": "`lineitem`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "rows": 4.0008,
+                              "cost": 301116,
+                              "chosen": true
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_l_suppkey",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_l_orderkey",
+                              "rows": 4.0008,
+                              "cost": 645552,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_l_orderkey_quantity",
+                              "rows": 4.0008,
+                              "cost": 645552,
+                              "chosen": false
+                            },
+                            {
+                              "rows_to_scan": 6001215,
+                              "filtering_effect": [
+                              ],
+                              "final_filtering_effect": 1,
+                              "access_type": "scan",
+                              "using_join_cache": true,
+                              "buffers_needed": 5,
+                              "resulting_rows": 6e6,
+                              "cost": 2.8e11,
+                              "chosen": false
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 1.84e6,
+                        "cost_for_plan": 454088,
+                        "pruned_by_cost": true
+                      }
+                    ]
+                  },
+                  {
+                    "plan_prefix": [
+                      "`region`"
+                    ],
+                    "table": "`lineitem`",
+                    "best_access_path": {
+                      "considered_access_paths": [
+                        {
+                          "access_type": "ref",
+                          "index": "PRIMARY",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "i_l_suppkey",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "i_l_orderkey",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "i_l_orderkey_quantity",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "rows_to_scan": 6001215,
+                          "filtering_effect": [
+                          ],
+                          "final_filtering_effect": 1,
+                          "access_type": "scan",
+                          "using_join_cache": true,
+                          "buffers_needed": 1,
+                          "resulting_rows": 6e6,
+                          "cost": 613022,
+                          "chosen": true
+                        }
+                      ]
+                    },
+                    "condition_filtering_pct": 100,
+                    "rows_for_plan": 6e6,
+                    "cost_for_plan": 613023,
+                    "pruned_by_cost": true
+                  }
+                ]
+              },
+              {
+                "plan_prefix": [
+                ],
+                "table": "`nation`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "access_type": "ref",
+                      "index": "PRIMARY",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "access_type": "ref",
+                      "index": "i_n_regionkey",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "rows_to_scan": 25,
+                      "filtering_effect": [
+                      ],
+                      "final_filtering_effect": 1,
+                      "access_type": "scan",
+                      "resulting_rows": 25,
+                      "cost": 2.75,
+                      "chosen": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 25,
+                "cost_for_plan": 2.75,
+                "pruned_by_heuristic": true
+              },
+              {
+                "plan_prefix": [
+                ],
+                "table": "`supplier`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "access_type": "ref",
+                      "index": "PRIMARY",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "access_type": "ref",
+                      "index": "i_s_nationkey",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "rows_to_scan": 10000,
+                      "filtering_effect": [
+                      ],
+                      "final_filtering_effect": 1,
+                      "access_type": "scan",
+                      "resulting_rows": 10000,
+                      "cost": 1040.2,
+                      "chosen": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 10000,
+                "cost_for_plan": 1040.2,
+                "pruned_by_heuristic": true
+              },
+              {
+                "plan_prefix": [
+                ],
+                "table": "`customer`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "access_type": "ref",
+                      "index": "PRIMARY",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "access_type": "ref",
+                      "index": "i_c_nationkey",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "rows_to_scan": 150000,
+                      "filtering_effect": [
+                      ],
+                      "final_filtering_effect": 1,
+                      "access_type": "scan",
+                      "resulting_rows": 150000,
+                      "cost": 15441,
+                      "chosen": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 150000,
+                "cost_for_plan": 15441,
+                "pruned_by_heuristic": true
+              },
+              {
+                "plan_prefix": [
+                ],
+                "table": "`orders`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "access_type": "ref",
+                      "index": "PRIMARY",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "access_type": "ref",
+                      "index": "i_o_custkey",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "rows_to_scan": 1500000,
+                      "filtering_effect": [
+                      ],
+                      "final_filtering_effect": 0.3073,
+                      "access_type": "scan",
+                      "resulting_rows": 460900,
+                      "cost": 152971,
+                      "chosen": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 460900,
+                "cost_for_plan": 152971,
+                "pruned_by_heuristic": true
+              },
+              {
+                "plan_prefix": [
+                ],
+                "table": "`lineitem`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "access_type": "ref",
+                      "index": "PRIMARY",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "access_type": "ref",
+                      "index": "i_l_suppkey",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "access_type": "ref",
+                      "index": "i_l_orderkey",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "access_type": "ref",
+                      "index": "i_l_orderkey_quantity",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "rows_to_scan": 6001215,
+                      "filtering_effect": [
+                      ],
+                      "final_filtering_effect": 1,
+                      "access_type": "scan",
+                      "resulting_rows": 6e6,
+                      "cost": 613022,
+                      "chosen": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 6e6,
+                "cost_for_plan": 613022,
+                "pruned_by_cost": true
+              }
+            ]
+          },
+          {
+            "attaching_conditions_to_tables": {
+              "original_condition": "((`region`.`r_name` = 'AFRICA') and (`nation`.`n_regionkey` = `region`.`r_regionkey`) and (`customer`.`c_nationkey` = `nation`.`n_nationkey`) and (`supplier`.`s_nationkey` = `nation`.`n_nationkey`) and (`supplier`.`s_suppkey` = `lineitem`.`l_suppkey`) and (`lineitem`.`l_orderkey` = `orders`.`o_orderkey`) and (`orders`.`o_custkey` = `customer`.`c_custkey`) and (`orders`.`o_orderDATE` >= '1994-01-01') and (`orders`.`o_orderDATE` < ('1994-01-01' + interval '1' year)))",
+              "attached_conditions_computation": [
+              ],
+              "attached_conditions_summary": [
+                {
+                  "table": "`region`",
+                  "attached": "(`region`.`r_name` = 'AFRICA')"
+                },
+                {
+                  "table": "`nation`",
+                  "attached": null
+                },
+                {
+                  "table": "`customer`",
+                  "attached": null
+                },
+                {
+                  "table": "`orders`",
+                  "attached": "((`orders`.`o_orderDATE` >= '1994-01-01') and (`orders`.`o_orderDATE` < ('1994-01-01' + interval '1' year)))"
+                },
+                {
+                  "table": "`lineitem`",
+                  "attached": "(`lineitem`.`l_suppkey` is not null)"
+                },
+                {
+                  "table": "`supplier`",
+                  "attached": "(`supplier`.`s_nationkey` = `nation`.`n_nationkey`)"
+                }
+              ]
+            }
+          },
+          {
+            "optimizing_distinct_group_by_order_by": {
+              "simplifying_order_by": {
+                "original_clause": "`revenue` desc",
+                "items": [
+                  {
+                    "item": "sum((`lineitem`.`l_extendedprice` * (1 - `lineitem`.`l_discount`)))"
+                  }
+                ],
+                "resulting_clause_is_simple": false,
+                "resulting_clause": "`revenue` desc"
+              },
+              "simplifying_group_by": {
+                "original_clause": "`nation`.`n_name`",
+                "items": [
+                  {
+                    "item": "`nation`.`n_name`"
+                  }
+                ],
+                "resulting_clause_is_simple": false,
+                "resulting_clause": "`nation`.`n_name`"
+              }
+            }
+          },
+          {
+            "refine_plan": [
+              {
+                "table": "`region`"
+              },
+              {
+                "table": "`nation`"
+              },
+              {
+                "table": "`customer`"
+              },
+              {
+                "table": "`orders`"
+              },
+              {
+                "table": "`lineitem`"
+              },
+              {
+                "table": "`supplier`"
+              }
+            ]
+          },
+          {
+            "considering_tmp_tables": [
+              {
+                "adding_tmp_table_in_plan_at_position": 6,
+                "write_method": "continuously_update_group_row"
+              },
+              {
+                "adding_sort_to_table_in_plan_at_position": 6
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "join_execution": {
+        "select#": 1,
+        "steps": [
+          {
+            "creating_tmp_table": {
+              "tmp_table_info": {
+                "table": "intermediate_tmp_table",
+                "in_plan_at_position": 6,
+                "columns": 2,
+                "row_length": 47,
+                "key_length": 26,
+                "unique_constraint": false,
+                "makes_grouped_rows": true,
+                "cannot_insert_duplicates": false,
+                "location": "TempTable"
+              }
+            }
+          },
+          {
+            "sorting_table_in_plan_at_position": 6,
+            "filesort_information": [
+              {
+                "direction": "desc",
+                "table": "intermediate_tmp_table",
+                "field": "revenue"
+              }
+            ],
+            "filesort_priority_queue_optimization": {
+              "usable": false,
+              "cause": "not applicable (no LIMIT)"
+            },
+            "filesort_execution": [
+            ],
+            "filesort_summary": {
+              "memory_available": 262144,
+              "key_size": 29,
+              "row_size": 29,
+              "max_rows_per_buffer": 15,
+              "num_rows_estimate": 15,
+              "num_rows_found": 5,
+              "num_initial_chunks_spilled_to_disk": 0,
+              "peak_memory_used": 32832,
+              "sort_algorithm": "std::sort",
+              "unpacked_addon_fields": "using_heap_table",
+              "sort_mode": "<fixed_sort_key, rowid>"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

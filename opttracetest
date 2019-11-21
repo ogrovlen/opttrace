@@ -1,0 +1,97 @@
+#!/bin/bash
+
+# Run regression tests for joinopttrace
+#
+# Traces in trace_examples subdiretory will be processed and the output will
+# be compared to the previously recorded result in the corresponding .res file
+# in the testresults subdirectory.
+#
+# Usage:
+# opttracetest [-r] [tracefile ...]
+#
+# -r records the current results
+#
+# If -r is not specified, and there is no existing result file, the current
+# result will be printed to stdout.
+#
+# If no tracefile is specified, all files in the trace_examples directory will
+# be processed.
+#
+# If environment variable MYSQL_SOURCE is set to an existing MySQL source tree,
+# all traces of the opt_trace test suite will also be processed.
+#
+
+# A POSIX variable
+OPTIND=1         # Reset in case getopts has been used previously in the shell.
+
+# Initialize our own variables:
+output_file=""
+record=0
+result_files=""
+
+# -r will record new result files
+while getopts "r" opt; do
+    case "$opt" in
+    r)  record=1
+        ;;
+    esac
+done
+
+shift $((OPTIND-1))
+
+if [ $# -eq 0 ]; then  # If no arguments test all test files
+    if [ -n "$MYSQL_SOURCE" ]; then  # Include results from opt_trace test suite
+       result_files=${MYSQL_SOURCE}/mysql-test/suite/opt_trace/r/*.result
+    fi
+    trace_files=trace_examples/*
+else
+    for file in $@
+    do
+        extension="${file##*.}"
+        if [ $extension == "result" ]; then
+            result_files+=" ${MYSQL_SOURCE}/mysql-test/suite/opt_trace/r/"$file
+        else
+            trace_files+=" trace_examples/"$file
+        fi
+    done
+fi
+
+for file in $result_files
+do
+    # Remove comments
+#    sed -E -e ':a; s%(.*)/\*.*\*/%\1%; ta; /\/\*/ !b; N; ba' $file > /tmp/tmp.result
+    sed -E -e 's%(.*)/\*.*\*/%\1%g' $file > /tmp/tmp.result
+    filename=$(basename "$file")
+    filename="${filename%.*}"
+
+    if ! node restrace.js /tmp/tmp.result > /tmp/tmp.out; then
+        printf 'ERROR in %s\n' $filename >&2
+    fi
+
+    if [ $record -eq 1 ]; then
+        mv /tmp/tmp.out testresults/$filename.res
+    else
+        diff -u testresults/$filename.res /tmp/tmp.out
+    fi
+done
+
+for file in $trace_files
+do
+    filename=$(basename "$file")
+
+    if ! node joinopttrace.js $file > /tmp/tmp.out; then
+        printf 'ERROR in %s\n' $filename >&2
+    fi
+
+    if [ $record -eq 1 ]; then
+        mv /tmp/tmp.out testresults/$filename.res
+    elif [ ! -f testresults/$filename.res ]
+    then
+        echo $filename
+        cat /tmp/tmp.out
+    else
+        diff -u testresults/$filename.res /tmp/tmp.out
+    fi
+done
+
+rm -f /tmp/tmp.result /tmp/tmp.out

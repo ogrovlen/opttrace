@@ -1,0 +1,2017 @@
+{
+  "steps": [
+    {
+      "join_preparation": {
+        "select#": 1,
+        "steps": [
+          {
+            "join_preparation": {
+              "select#": 2,
+              "steps": [
+                {
+                  "join_preparation": {
+                    "select#": 3,
+                    "steps": [
+                      {
+                        "expanded_query": "/* select#3 */ select (0.5 * sum(`lineitem`.`l_quantity`)) from `lineitem` where ((`lineitem`.`l_partkey` = `partsupp`.`ps_partkey`) and (`lineitem`.`l_suppkey` = `partsupp`.`ps_suppkey`) and (`lineitem`.`l_shipDATE` >= '1995-01-01') and (`lineitem`.`l_shipDATE` < ('1995-01-01' + interval '1' year)))"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "transformations_to_subquery": [
+                    "removed_distinct"
+                  ]
+                },
+                {
+                  "expanded_query": "/* select#2 */ select `partsupp`.`ps_suppkey` from `partsupp` join `part` where ((`partsupp`.`ps_partkey` = `part`.`p_partkey`) and (`part`.`p_name` like 'grey%') and (`partsupp`.`ps_availqty` > (/* select#3 */ select (0.5 * sum(`lineitem`.`l_quantity`)) from `lineitem` where ((`lineitem`.`l_partkey` = `partsupp`.`ps_partkey`) and (`lineitem`.`l_suppkey` = `partsupp`.`ps_suppkey`) and (`lineitem`.`l_shipDATE` >= '1995-01-01') and (`lineitem`.`l_shipDATE` < ('1995-01-01' + interval '1' year))))))"
+                },
+                {
+                  "transformation": {
+                    "select#": 2,
+                    "from": "IN (SELECT)",
+                    "to": "semijoin",
+                    "chosen": true
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "expanded_query": "/* select#1 */ select `supplier`.`s_name` AS `s_name`,`supplier`.`s_address` AS `s_address` from `supplier` join `nation` where (`supplier`.`s_suppkey` in (/* select#2 */ select `partsupp`.`ps_suppkey` from `partsupp` join `part` where ((`partsupp`.`ps_partkey` = `part`.`p_partkey`) and (`part`.`p_name` like 'grey%') and (`partsupp`.`ps_availqty` > (/* select#3 */ select (0.5 * sum(`lineitem`.`l_quantity`)) from `lineitem` where ((`lineitem`.`l_partkey` = `partsupp`.`ps_partkey`) and (`lineitem`.`l_suppkey` = `partsupp`.`ps_suppkey`) and (`lineitem`.`l_shipDATE` >= '1995-01-01') and (`lineitem`.`l_shipDATE` < ('1995-01-01' + interval '1' year))))))) and (`supplier`.`s_nationkey` = `nation`.`n_nationkey`) and (`nation`.`n_name` = 'SAUDI ARABIA')) order by `supplier`.`s_name`"
+          },
+          {
+            "transformation": {
+              "select#": 2,
+              "from": "IN (SELECT)",
+              "to": "semijoin",
+              "chosen": true,
+              "evaluating_constant_semijoin_conditions": [
+              ]
+            }
+          },
+          {
+            "transformations_to_nested_joins": {
+              "transformations": [
+                "semijoin"
+              ],
+              "expanded_query": "/* select#1 */ select `supplier`.`s_name` AS `s_name`,`supplier`.`s_address` AS `s_address` from `supplier` semi join (`partsupp` join `part`) join `nation` where (1 and (`supplier`.`s_nationkey` = `nation`.`n_nationkey`) and (`nation`.`n_name` = 'SAUDI ARABIA') and (`partsupp`.`ps_partkey` = `part`.`p_partkey`) and (`part`.`p_name` like 'grey%') and (`partsupp`.`ps_availqty` > (/* select#3 */ select (0.5 * sum(`lineitem`.`l_quantity`)) from `lineitem` where ((`lineitem`.`l_partkey` = `partsupp`.`ps_partkey`) and (`lineitem`.`l_suppkey` = `partsupp`.`ps_suppkey`) and (`lineitem`.`l_shipDATE` >= '1995-01-01') and (`lineitem`.`l_shipDATE` < ('1995-01-01' + interval '1' year))))) and (`supplier`.`s_suppkey` = `partsupp`.`ps_suppkey`)) order by `supplier`.`s_name`"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "join_optimization": {
+        "select#": 1,
+        "steps": [
+          {
+            "condition_processing": {
+              "condition": "WHERE",
+              "original_condition": "(1 and (`supplier`.`s_nationkey` = `nation`.`n_nationkey`) and (`nation`.`n_name` = 'SAUDI ARABIA') and (`partsupp`.`ps_partkey` = `part`.`p_partkey`) and (`part`.`p_name` like 'grey%') and (`partsupp`.`ps_availqty` > (/* select#3 */ select (0.5 * sum(`lineitem`.`l_quantity`)) from `lineitem` where ((`lineitem`.`l_partkey` = `partsupp`.`ps_partkey`) and (`lineitem`.`l_suppkey` = `partsupp`.`ps_suppkey`) and (`lineitem`.`l_shipDATE` >= '1995-01-01') and (`lineitem`.`l_shipDATE` < ('1995-01-01' + interval '1' year))))) and (`supplier`.`s_suppkey` = `partsupp`.`ps_suppkey`))",
+              "steps": [
+                {
+                  "transformation": "equality_propagation",
+                  "subselect_evaluation": [
+                  ],
+                  "resulting_condition": "(1 and (`part`.`p_name` like 'grey%') and (`partsupp`.`ps_availqty` > (/* select#3 */ select (0.5 * sum(`lineitem`.`l_quantity`)) from `lineitem` where ((`lineitem`.`l_partkey` = `partsupp`.`ps_partkey`) and (`lineitem`.`l_suppkey` = `partsupp`.`ps_suppkey`) and (`lineitem`.`l_shipDATE` >= '1995-01-01') and (`lineitem`.`l_shipDATE` < ('1995-01-01' + interval '1' year))))) and multiple equal(`supplier`.`s_nationkey`, `nation`.`n_nationkey`) and multiple equal('SAUDI ARABIA', `nation`.`n_name`) and multiple equal(`partsupp`.`ps_partkey`, `part`.`p_partkey`) and multiple equal(`supplier`.`s_suppkey`, `partsupp`.`ps_suppkey`))"
+                },
+                {
+                  "transformation": "constant_propagation",
+                  "subselect_evaluation": [
+                  ],
+                  "resulting_condition": "(1 and (`part`.`p_name` like 'grey%') and (`partsupp`.`ps_availqty` > (/* select#3 */ select (0.5 * sum(`lineitem`.`l_quantity`)) from `lineitem` where ((`lineitem`.`l_partkey` = `partsupp`.`ps_partkey`) and (`lineitem`.`l_suppkey` = `partsupp`.`ps_suppkey`) and (`lineitem`.`l_shipDATE` >= '1995-01-01') and (`lineitem`.`l_shipDATE` < ('1995-01-01' + interval '1' year))))) and multiple equal(`supplier`.`s_nationkey`, `nation`.`n_nationkey`) and multiple equal('SAUDI ARABIA', `nation`.`n_name`) and multiple equal(`partsupp`.`ps_partkey`, `part`.`p_partkey`) and multiple equal(`supplier`.`s_suppkey`, `partsupp`.`ps_suppkey`))"
+                },
+                {
+                  "transformation": "trivial_condition_removal",
+                  "subselect_evaluation": [
+                  ],
+                  "resulting_condition": "((`part`.`p_name` like 'grey%') and (`partsupp`.`ps_availqty` > (/* select#3 */ select (0.5 * sum(`lineitem`.`l_quantity`)) from `lineitem` where ((`lineitem`.`l_partkey` = `partsupp`.`ps_partkey`) and (`lineitem`.`l_suppkey` = `partsupp`.`ps_suppkey`) and (`lineitem`.`l_shipDATE` >= '1995-01-01') and (`lineitem`.`l_shipDATE` < ('1995-01-01' + interval '1' year))))) and multiple equal(`supplier`.`s_nationkey`, `nation`.`n_nationkey`) and multiple equal('SAUDI ARABIA', `nation`.`n_name`) and multiple equal(`partsupp`.`ps_partkey`, `part`.`p_partkey`) and multiple equal(`supplier`.`s_suppkey`, `partsupp`.`ps_suppkey`))"
+                }
+              ]
+            }
+          },
+          {
+            "substitute_generated_columns": {
+            }
+          },
+          {
+            "table_dependencies": [
+              {
+                "table": "`supplier`",
+                "row_may_be_null": false,
+                "map_bit": 0,
+                "depends_on_map_bits": [
+                ]
+              },
+              {
+                "table": "`nation`",
+                "row_may_be_null": false,
+                "map_bit": 1,
+                "depends_on_map_bits": [
+                ]
+              },
+              {
+                "table": "`partsupp`",
+                "row_may_be_null": false,
+                "map_bit": 2,
+                "depends_on_map_bits": [
+                ]
+              },
+              {
+                "table": "`part`",
+                "row_may_be_null": false,
+                "map_bit": 3,
+                "depends_on_map_bits": [
+                ]
+              }
+            ]
+          },
+          {
+            "ref_optimizer_key_uses": [
+              {
+                "table": "`supplier`",
+                "field": "s_suppkey",
+                "equals": "`partsupp`.`ps_suppkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`supplier`",
+                "field": "s_nationkey",
+                "equals": "`nation`.`n_nationkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`supplier`",
+                "field": "s_suppkey",
+                "equals": "`partsupp`.`ps_suppkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`nation`",
+                "field": "n_nationkey",
+                "equals": "`supplier`.`s_nationkey`",
+                "null_rejecting": true
+              },
+              {
+                "table": "`partsupp`",
+                "field": "ps_partkey",
+                "equals": "`part`.`p_partkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`partsupp`",
+                "field": "ps_suppkey",
+                "equals": "`supplier`.`s_suppkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`partsupp`",
+                "field": "ps_partkey",
+                "equals": "`part`.`p_partkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`partsupp`",
+                "field": "ps_suppkey",
+                "equals": "`supplier`.`s_suppkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`partsupp`",
+                "field": "ps_suppkey",
+                "equals": "`supplier`.`s_suppkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`partsupp`",
+                "field": "ps_partkey",
+                "equals": "`part`.`p_partkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`part`",
+                "field": "p_partkey",
+                "equals": "`partsupp`.`ps_partkey`",
+                "null_rejecting": false
+              }
+            ]
+          },
+          {
+            "pulled_out_semijoin_tables": [
+            ]
+          },
+          {
+            "rows_estimation": [
+              {
+                "table": "`supplier`",
+                "table_scan": {
+                  "rows": 10000,
+                  "cost": 40.25
+                }
+              },
+              {
+                "table": "`nation`",
+                "table_scan": {
+                  "rows": 25,
+                  "cost": 0.25
+                }
+              },
+              {
+                "table": "`partsupp`",
+                "table_scan": {
+                  "rows": 800000,
+                  "cost": 4814.3
+                }
+              },
+              {
+                "table": "`part`",
+                "table_scan": {
+                  "rows": 200000,
+                  "cost": 489
+                }
+              }
+            ]
+          },
+          {
+            "execution_plan_for_potential_materialization": {
+              "steps": [
+                {
+                  "considered_execution_plans": [
+                    {
+                      "plan_prefix": [
+                      ],
+                      "table": "`part`",
+                      "best_access_path": {
+                        "considered_access_paths": [
+                          {
+                            "access_type": "ref",
+                            "index": "PRIMARY",
+                            "usable": false,
+                            "chosen": false
+                          },
+                          {
+                            "rows_to_scan": 200000,
+                            "filtering_effect": [
+                            ],
+                            "final_filtering_effect": 0.1111,
+                            "access_type": "scan",
+                            "resulting_rows": 22220,
+                            "cost": 20489,
+                            "chosen": true
+                          }
+                        ]
+                      },
+                      "condition_filtering_pct": 100,
+                      "rows_for_plan": 22220,
+                      "cost_for_plan": 20489,
+                      "rest_of_plan": [
+                        {
+                          "plan_prefix": [
+                            "`part`"
+                          ],
+                          "table": "`partsupp`",
+                          "best_access_path": {
+                            "considered_access_paths": [
+                              {
+                                "access_type": "ref",
+                                "index": "PRIMARY",
+                                "rows": 4,
+                                "cost": 17428,
+                                "chosen": true
+                              },
+                              {
+                                "access_type": "ref",
+                                "index": "i_ps_partkey",
+                                "rows": 4,
+                                "cost": 42867,
+                                "chosen": false
+                              },
+                              {
+                                "access_type": "ref",
+                                "index": "i_ps_suppkey",
+                                "usable": false,
+                                "chosen": false
+                              },
+                              {
+                                "rows_to_scan": 800000,
+                                "filtering_effect": [
+                                ],
+                                "final_filtering_effect": 1,
+                                "access_type": "scan",
+                                "using_join_cache": true,
+                                "buffers_needed": 1,
+                                "resulting_rows": 800000,
+                                "cost": 1.78e9,
+                                "chosen": false
+                              }
+                            ]
+                          },
+                          "condition_filtering_pct": 100,
+                          "rows_for_plan": 88880,
+                          "cost_for_plan": 37917,
+                          "sort_cost": 88880,
+                          "new_cost_for_plan": 126797,
+                          "chosen": true
+                        }
+                      ]
+                    },
+                    {
+                      "plan_prefix": [
+                      ],
+                      "table": "`partsupp`",
+                      "best_access_path": {
+                        "considered_access_paths": [
+                          {
+                            "access_type": "ref",
+                            "index": "PRIMARY",
+                            "usable": false,
+                            "chosen": false
+                          },
+                          {
+                            "access_type": "ref",
+                            "index": "i_ps_partkey",
+                            "usable": false,
+                            "chosen": false
+                          },
+                          {
+                            "access_type": "ref",
+                            "index": "i_ps_suppkey",
+                            "usable": false,
+                            "chosen": false
+                          },
+                          {
+                            "rows_to_scan": 800000,
+                            "filtering_effect": [
+                            ],
+                            "final_filtering_effect": 1,
+                            "access_type": "scan",
+                            "resulting_rows": 800000,
+                            "cost": 84814,
+                            "chosen": true
+                          }
+                        ]
+                      },
+                      "condition_filtering_pct": 100,
+                      "rows_for_plan": 800000,
+                      "cost_for_plan": 84814,
+                      "rest_of_plan": [
+                        {
+                          "plan_prefix": [
+                            "`partsupp`"
+                          ],
+                          "table": "`part`",
+                          "best_access_path": {
+                            "considered_access_paths": [
+                              {
+                                "access_type": "eq_ref",
+                                "index": "PRIMARY",
+                                "rows": 1,
+                                "cost": 280000,
+                                "chosen": true,
+                                "cause": "clustered_pk_chosen_by_heuristics"
+                              },
+                              {
+                                "rows_to_scan": 200000,
+                                "filtering_effect": [
+                                ],
+                                "final_filtering_effect": 0.1111,
+                                "access_type": "scan",
+                                "using_join_cache": true,
+                                "buffers_needed": 3,
+                                "resulting_rows": 22220,
+                                "cost": 1.78e9,
+                                "chosen": false
+                              }
+                            ]
+                          },
+                          "condition_filtering_pct": 11.11,
+                          "rows_for_plan": 88880,
+                          "cost_for_plan": 364814,
+                          "pruned_by_cost": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "considered_execution_plans": [
+              {
+                "plan_prefix": [
+                ],
+                "table": "`nation`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "access_type": "ref",
+                      "index": "PRIMARY",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "rows_to_scan": 25,
+                      "filtering_effect": [
+                      ],
+                      "final_filtering_effect": 0.1,
+                      "access_type": "scan",
+                      "resulting_rows": 2.5,
+                      "cost": 2.75,
+                      "chosen": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 2.5,
+                "cost_for_plan": 2.75,
+                "semijoin_strategy_choice": [
+                ],
+                "rest_of_plan": [
+                  {
+                    "plan_prefix": [
+                      "`nation`"
+                    ],
+                    "table": "`supplier`",
+                    "best_access_path": {
+                      "considered_access_paths": [
+                        {
+                          "access_type": "ref",
+                          "index": "PRIMARY",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "i_s_nationkey",
+                          "rows": 400,
+                          "cost": 350,
+                          "chosen": true
+                        },
+                        {
+                          "rows_to_scan": 10000,
+                          "filtering_effect": [
+                          ],
+                          "final_filtering_effect": 1,
+                          "access_type": "scan",
+                          "using_join_cache": true,
+                          "buffers_needed": 1,
+                          "resulting_rows": 10000,
+                          "cost": 2540.3,
+                          "chosen": false
+                        }
+                      ]
+                    },
+                    "condition_filtering_pct": 100,
+                    "rows_for_plan": 1000,
+                    "cost_for_plan": 352.75,
+                    "semijoin_strategy_choice": [
+                    ],
+                    "rest_of_plan": [
+                      {
+                        "plan_prefix": [
+                          "`nation`",
+                          "`supplier`"
+                        ],
+                        "table": "`part`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "rows_to_scan": 200000,
+                              "filtering_effect": [
+                              ],
+                              "final_filtering_effect": 0.1111,
+                              "access_type": "scan",
+                              "using_join_cache": true,
+                              "buffers_needed": 1,
+                              "resulting_rows": 22220,
+                              "cost": 2.24e6,
+                              "chosen": true
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 2.22e7,
+                        "cost_for_plan": 2.24e6,
+                        "semijoin_strategy_choice": [
+                        ],
+                        "rest_of_plan": [
+                          {
+                            "plan_prefix": [
+                              "`nation`",
+                              "`supplier`",
+                              "`part`"
+                            ],
+                            "table": "`partsupp`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "eq_ref",
+                                  "index": "PRIMARY",
+                                  "rows": 1,
+                                  "cost": 1.07e7,
+                                  "chosen": true,
+                                  "cause": "clustered_pk_chosen_by_heuristics"
+                                },
+                                {
+                                  "rows_to_scan": 800000,
+                                  "filtering_effect": [
+                                  ],
+                                  "final_filtering_effect": 1,
+                                  "access_type": "scan",
+                                  "using_join_cache": true,
+                                  "buffers_needed": 880,
+                                  "resulting_rows": 800000,
+                                  "cost": 1.8e12,
+                                  "chosen": false
+                                }
+                              ]
+                            },
+                            "condition_filtering_pct": 100,
+                            "rows_for_plan": 2.22e7,
+                            "cost_for_plan": 1.3e7,
+                            "semijoin_strategy_choice": [
+                              {
+                                "strategy": "FirstMatch",
+                                "recalculate_access_paths_and_cost": {
+                                  "tables": [
+                                    {
+                                      "table": "`part`",
+                                      "best_access_path": {
+                                        "considered_access_paths": [
+                                          {
+                                            "access_type": "ref",
+                                            "index": "PRIMARY",
+                                            "usable": false,
+                                            "chosen": false
+                                          },
+                                          {
+                                            "rows_to_scan": 200000,
+                                            "filtering_effect": [
+                                            ],
+                                            "final_filtering_effect": 0.1111,
+                                            "access_type": "scan",
+                                            "resulting_rows": 22220,
+                                            "cost": 2.05e7,
+                                            "chosen": true
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                },
+                                "cost": 3.12e7,
+                                "rows": 1000,
+                                "chosen": true
+                              },
+                              {
+                                "strategy": "MaterializeLookup",
+                                "cost": 47259,
+                                "rows": 1000,
+                                "duplicate_tables_left": false,
+                                "chosen": true
+                              },
+                              {
+                                "strategy": "DuplicatesWeedout",
+                                "cost": 1.52e7,
+                                "rows": 1000,
+                                "duplicate_tables_left": false,
+                                "chosen": false
+                              }
+                            ],
+                            "sort_cost": 1000,
+                            "new_cost_for_plan": 48259,
+                            "chosen": true
+                          }
+                        ]
+                      },
+                      {
+                        "plan_prefix": [
+                          "`nation`",
+                          "`supplier`"
+                        ],
+                        "table": "`partsupp`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_ps_partkey",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_ps_suppkey",
+                              "rows": 80,
+                              "cost": 38584,
+                              "chosen": true
+                            },
+                            {
+                              "rows_to_scan": 800000,
+                              "filtering_effect": [
+                              ],
+                              "final_filtering_effect": 1,
+                              "access_type": "scan",
+                              "using_join_cache": true,
+                              "buffers_needed": 1,
+                              "resulting_rows": 800000,
+                              "cost": 8e7,
+                              "chosen": false
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 80000,
+                        "cost_for_plan": 38937,
+                        "semijoin_strategy_choice": [
+                        ],
+                        "rest_of_plan": [
+                          {
+                            "plan_prefix": [
+                              "`nation`",
+                              "`supplier`",
+                              "`partsupp`"
+                            ],
+                            "table": "`part`",
+                            "best_access_path": {
+                              "considered_access_paths": [
+                                {
+                                  "access_type": "eq_ref",
+                                  "index": "PRIMARY",
+                                  "rows": 1,
+                                  "cost": 28000,
+                                  "chosen": true,
+                                  "cause": "clustered_pk_chosen_by_heuristics"
+                                },
+                                {
+                                  "rows_to_scan": 200000,
+                                  "filtering_effect": [
+                                  ],
+                                  "final_filtering_effect": 0.1111,
+                                  "access_type": "scan",
+                                  "using_join_cache": true,
+                                  "buffers_needed": 3,
+                                  "resulting_rows": 22220,
+                                  "cost": 1.78e8,
+                                  "chosen": false
+                                }
+                              ]
+                            },
+                            "condition_filtering_pct": 11.11,
+                            "rows_for_plan": 8888,
+                            "cost_for_plan": 66937,
+                            "semijoin_strategy_choice": [
+                              {
+                                "strategy": "FirstMatch",
+                                "recalculate_access_paths_and_cost": {
+                                  "tables": [
+                                  ]
+                                },
+                                "cost": 66937,
+                                "rows": 1000,
+                                "chosen": true
+                              },
+                              {
+                                "strategy": "MaterializeLookup",
+                                "cost": 47259,
+                                "rows": 1000,
+                                "duplicate_tables_left": false,
+                                "chosen": true
+                              },
+                              {
+                                "strategy": "DuplicatesWeedout",
+                                "cost": 67927,
+                                "rows": 1000,
+                                "duplicate_tables_left": false,
+                                "chosen": false
+                              }
+                            ],
+                            "sort_cost": 1000,
+                            "new_cost_for_plan": 48259,
+                            "chosen": false
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "plan_prefix": [
+                      "`nation`"
+                    ],
+                    "table": "`part`",
+                    "best_access_path": {
+                      "considered_access_paths": [
+                        {
+                          "access_type": "ref",
+                          "index": "PRIMARY",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "rows_to_scan": 200000,
+                          "filtering_effect": [
+                          ],
+                          "final_filtering_effect": 0.1111,
+                          "access_type": "scan",
+                          "using_join_cache": true,
+                          "buffers_needed": 1,
+                          "resulting_rows": 22220,
+                          "cost": 23822,
+                          "chosen": true
+                        }
+                      ]
+                    },
+                    "condition_filtering_pct": 100,
+                    "rows_for_plan": 55550,
+                    "cost_for_plan": 23825,
+                    "semijoin_strategy_choice": [
+                    ],
+                    "rest_of_plan": [
+                      {
+                        "plan_prefix": [
+                          "`nation`",
+                          "`part`"
+                        ],
+                        "table": "`supplier`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_s_nationkey",
+                              "rows": 400,
+                              "cost": 7.78e6,
+                              "chosen": true
+                            },
+                            {
+                              "rows_to_scan": 10000,
+                              "filtering_effect": [
+                              ],
+                              "final_filtering_effect": 1,
+                              "access_type": "scan",
+                              "using_join_cache": true,
+                              "buffers_needed": 2,
+                              "resulting_rows": 10000,
+                              "cost": 5.56e7,
+                              "chosen": false
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 2.22e7,
+                        "cost_for_plan": 7.8e6,
+                        "semijoin_strategy_choice": [
+                        ],
+                        "pruned_by_cost": true
+                      },
+                      {
+                        "plan_prefix": [
+                          "`nation`",
+                          "`part`"
+                        ],
+                        "table": "`partsupp`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "rows": 4,
+                              "cost": 43570,
+                              "chosen": true
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_ps_partkey",
+                              "rows": 4,
+                              "cost": 107167,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_ps_suppkey",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "rows_to_scan": 800000,
+                              "filtering_effect": [
+                              ],
+                              "final_filtering_effect": 1,
+                              "access_type": "scan",
+                              "using_join_cache": true,
+                              "buffers_needed": 2,
+                              "resulting_rows": 800000,
+                              "cost": 4.44e9,
+                              "chosen": false
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 222200,
+                        "cost_for_plan": 67395,
+                        "semijoin_strategy_choice": [
+                          {
+                            "strategy": "MaterializeScan",
+                            "choice": "deferred"
+                          }
+                        ],
+                        "pruned_by_cost": true
+                      }
+                    ]
+                  },
+                  {
+                    "plan_prefix": [
+                      "`nation`"
+                    ],
+                    "table": "`partsupp`",
+                    "best_access_path": {
+                      "considered_access_paths": [
+                        {
+                          "access_type": "ref",
+                          "index": "PRIMARY",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "i_ps_partkey",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "i_ps_suppkey",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "rows_to_scan": 800000,
+                          "filtering_effect": [
+                          ],
+                          "final_filtering_effect": 1,
+                          "access_type": "scan",
+                          "using_join_cache": true,
+                          "buffers_needed": 1,
+                          "resulting_rows": 800000,
+                          "cost": 204814,
+                          "chosen": true
+                        }
+                      ]
+                    },
+                    "condition_filtering_pct": 100,
+                    "rows_for_plan": 2e6,
+                    "cost_for_plan": 204817,
+                    "semijoin_strategy_choice": [
+                    ],
+                    "pruned_by_cost": true
+                  }
+                ]
+              },
+              {
+                "plan_prefix": [
+                ],
+                "table": "`supplier`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "access_type": "ref",
+                      "index": "PRIMARY",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "access_type": "ref",
+                      "index": "i_s_nationkey",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "rows_to_scan": 10000,
+                      "filtering_effect": [
+                      ],
+                      "final_filtering_effect": 1,
+                      "access_type": "scan",
+                      "resulting_rows": 10000,
+                      "cost": 1040.2,
+                      "chosen": true,
+                      "use_tmp_table": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 10000,
+                "cost_for_plan": 1040.2,
+                "semijoin_strategy_choice": [
+                ],
+                "rest_of_plan": [
+                  {
+                    "plan_prefix": [
+                      "`supplier`"
+                    ],
+                    "table": "`nation`",
+                    "best_access_path": {
+                      "considered_access_paths": [
+                        {
+                          "access_type": "eq_ref",
+                          "index": "PRIMARY",
+                          "rows": 1,
+                          "cost": 3500,
+                          "chosen": true,
+                          "cause": "clustered_pk_chosen_by_heuristics"
+                        },
+                        {
+                          "rows_to_scan": 25,
+                          "filtering_effect": [
+                          ],
+                          "final_filtering_effect": 0.1,
+                          "access_type": "scan",
+                          "using_join_cache": true,
+                          "buffers_needed": 1,
+                          "resulting_rows": 2.5,
+                          "cost": 2502.9,
+                          "chosen": true
+                        }
+                      ]
+                    },
+                    "condition_filtering_pct": 40,
+                    "rows_for_plan": 10000,
+                    "cost_for_plan": 3543.2,
+                    "semijoin_strategy_choice": [
+                    ],
+                    "rest_of_plan": [
+                      {
+                        "plan_prefix": [
+                          "`supplier`",
+                          "`nation`"
+                        ],
+                        "table": "`part`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "rows_to_scan": 200000,
+                              "filtering_effect": [
+                              ],
+                              "final_filtering_effect": 0.1111,
+                              "access_type": "scan",
+                              "using_join_cache": true,
+                              "buffers_needed": 1,
+                              "resulting_rows": 22220,
+                              "cost": 2.22e7,
+                              "chosen": true
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 2.22e8,
+                        "cost_for_plan": 2.22e7,
+                        "semijoin_strategy_choice": [
+                        ],
+                        "pruned_by_cost": true
+                      },
+                      {
+                        "plan_prefix": [
+                          "`supplier`",
+                          "`nation`"
+                        ],
+                        "table": "`partsupp`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_ps_partkey",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_ps_suppkey",
+                              "rows": 80,
+                              "cost": 385841,
+                              "chosen": true
+                            },
+                            {
+                              "rows_to_scan": 800000,
+                              "filtering_effect": [
+                              ],
+                              "final_filtering_effect": 1,
+                              "access_type": "scan",
+                              "using_join_cache": true,
+                              "buffers_needed": 1,
+                              "resulting_rows": 800000,
+                              "cost": 8e8,
+                              "chosen": false
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 800000,
+                        "cost_for_plan": 389384,
+                        "semijoin_strategy_choice": [
+                        ],
+                        "pruned_by_cost": true
+                      }
+                    ]
+                  },
+                  {
+                    "plan_prefix": [
+                      "`supplier`"
+                    ],
+                    "table": "`part`",
+                    "best_access_path": {
+                      "considered_access_paths": [
+                        {
+                          "access_type": "ref",
+                          "index": "PRIMARY",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "rows_to_scan": 200000,
+                          "filtering_effect": [
+                          ],
+                          "final_filtering_effect": 0.1111,
+                          "access_type": "scan",
+                          "using_join_cache": true,
+                          "buffers_needed": 1,
+                          "resulting_rows": 22220,
+                          "cost": 2.22e7,
+                          "chosen": true
+                        }
+                      ]
+                    },
+                    "condition_filtering_pct": 100,
+                    "rows_for_plan": 2.22e8,
+                    "cost_for_plan": 2.22e7,
+                    "semijoin_strategy_choice": [
+                    ],
+                    "pruned_by_cost": true
+                  },
+                  {
+                    "plan_prefix": [
+                      "`supplier`"
+                    ],
+                    "table": "`partsupp`",
+                    "best_access_path": {
+                      "considered_access_paths": [
+                        {
+                          "access_type": "ref",
+                          "index": "PRIMARY",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "i_ps_partkey",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "i_ps_suppkey",
+                          "rows": 80,
+                          "cost": 385841,
+                          "chosen": true
+                        },
+                        {
+                          "rows_to_scan": 800000,
+                          "filtering_effect": [
+                          ],
+                          "final_filtering_effect": 1,
+                          "access_type": "scan",
+                          "using_join_cache": true,
+                          "buffers_needed": 1,
+                          "resulting_rows": 800000,
+                          "cost": 8e8,
+                          "chosen": false
+                        }
+                      ]
+                    },
+                    "condition_filtering_pct": 100,
+                    "rows_for_plan": 800000,
+                    "cost_for_plan": 386881,
+                    "semijoin_strategy_choice": [
+                    ],
+                    "pruned_by_cost": true
+                  }
+                ]
+              },
+              {
+                "plan_prefix": [
+                ],
+                "table": "`part`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "access_type": "ref",
+                      "index": "PRIMARY",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "rows_to_scan": 200000,
+                      "filtering_effect": [
+                      ],
+                      "final_filtering_effect": 0.1111,
+                      "access_type": "scan",
+                      "resulting_rows": 22220,
+                      "cost": 20489,
+                      "chosen": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 22220,
+                "cost_for_plan": 20489,
+                "semijoin_strategy_choice": [
+                ],
+                "rest_of_plan": [
+                  {
+                    "plan_prefix": [
+                      "`part`"
+                    ],
+                    "table": "`nation`",
+                    "best_access_path": {
+                      "considered_access_paths": [
+                        {
+                          "access_type": "ref",
+                          "index": "PRIMARY",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "rows_to_scan": 25,
+                          "filtering_effect": [
+                          ],
+                          "final_filtering_effect": 0.1,
+                          "access_type": "scan",
+                          "using_join_cache": true,
+                          "buffers_needed": 1,
+                          "resulting_rows": 2.5,
+                          "cost": 5558.3,
+                          "chosen": true
+                        }
+                      ]
+                    },
+                    "condition_filtering_pct": 100,
+                    "rows_for_plan": 55550,
+                    "cost_for_plan": 26047,
+                    "semijoin_strategy_choice": [
+                    ],
+                    "rest_of_plan": [
+                      {
+                        "plan_prefix": [
+                          "`part`",
+                          "`nation`"
+                        ],
+                        "table": "`supplier`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_s_nationkey",
+                              "rows": 400,
+                              "cost": 7.78e6,
+                              "chosen": true
+                            },
+                            {
+                              "rows_to_scan": 10000,
+                              "filtering_effect": [
+                              ],
+                              "final_filtering_effect": 1,
+                              "access_type": "scan",
+                              "using_join_cache": true,
+                              "buffers_needed": 2,
+                              "resulting_rows": 10000,
+                              "cost": 5.56e7,
+                              "chosen": false
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 2.22e7,
+                        "cost_for_plan": 7.8e6,
+                        "semijoin_strategy_choice": [
+                        ],
+                        "pruned_by_cost": true
+                      },
+                      {
+                        "plan_prefix": [
+                          "`part`",
+                          "`nation`"
+                        ],
+                        "table": "`partsupp`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "rows": 4,
+                              "cost": 43570,
+                              "chosen": true
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_ps_partkey",
+                              "rows": 4,
+                              "cost": 107167,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_ps_suppkey",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "rows_to_scan": 800000,
+                              "filtering_effect": [
+                              ],
+                              "final_filtering_effect": 1,
+                              "access_type": "scan",
+                              "using_join_cache": true,
+                              "buffers_needed": 2,
+                              "resulting_rows": 800000,
+                              "cost": 4.44e9,
+                              "chosen": false
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 222200,
+                        "cost_for_plan": 69617,
+                        "semijoin_strategy_choice": [
+                        ],
+                        "pruned_by_cost": true
+                      }
+                    ]
+                  },
+                  {
+                    "plan_prefix": [
+                      "`part`"
+                    ],
+                    "table": "`supplier`",
+                    "best_access_path": {
+                      "considered_access_paths": [
+                        {
+                          "access_type": "ref",
+                          "index": "PRIMARY",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "i_s_nationkey",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "rows_to_scan": 10000,
+                          "filtering_effect": [
+                          ],
+                          "final_filtering_effect": 1,
+                          "access_type": "scan",
+                          "using_join_cache": true,
+                          "buffers_needed": 1,
+                          "resulting_rows": 10000,
+                          "cost": 2.22e7,
+                          "chosen": true
+                        }
+                      ]
+                    },
+                    "condition_filtering_pct": 100,
+                    "rows_for_plan": 2.22e8,
+                    "cost_for_plan": 2.22e7,
+                    "semijoin_strategy_choice": [
+                    ],
+                    "pruned_by_cost": true
+                  },
+                  {
+                    "plan_prefix": [
+                      "`part`"
+                    ],
+                    "table": "`partsupp`",
+                    "best_access_path": {
+                      "considered_access_paths": [
+                        {
+                          "access_type": "ref",
+                          "index": "PRIMARY",
+                          "rows": 4,
+                          "cost": 17428,
+                          "chosen": true
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "i_ps_partkey",
+                          "rows": 4,
+                          "cost": 42867,
+                          "chosen": false
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "i_ps_suppkey",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "rows_to_scan": 800000,
+                          "filtering_effect": [
+                          ],
+                          "final_filtering_effect": 1,
+                          "access_type": "scan",
+                          "using_join_cache": true,
+                          "buffers_needed": 1,
+                          "resulting_rows": 800000,
+                          "cost": 1.78e9,
+                          "chosen": false
+                        }
+                      ]
+                    },
+                    "condition_filtering_pct": 100,
+                    "rows_for_plan": 88880,
+                    "cost_for_plan": 37917,
+                    "semijoin_strategy_choice": [
+                      {
+                        "strategy": "MaterializeScan",
+                        "choice": "deferred"
+                      }
+                    ],
+                    "rest_of_plan": [
+                      {
+                        "plan_prefix": [
+                          "`part`",
+                          "`partsupp`"
+                        ],
+                        "table": "`nation`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "usable": false,
+                              "chosen": false
+                            },
+                            {
+                              "rows_to_scan": 25,
+                              "filtering_effect": [
+                              ],
+                              "final_filtering_effect": 0.1,
+                              "access_type": "scan",
+                              "using_join_cache": true,
+                              "buffers_needed": 2,
+                              "resulting_rows": 2.5,
+                              "cost": 22226,
+                              "chosen": true
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 222200,
+                        "cost_for_plan": 60143,
+                        "semijoin_strategy_choice": [
+                        ],
+                        "pruned_by_cost": true
+                      },
+                      {
+                        "plan_prefix": [
+                          "`part`",
+                          "`partsupp`"
+                        ],
+                        "table": "`supplier`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "eq_ref",
+                              "index": "PRIMARY",
+                              "rows": 1,
+                              "cost": 31108,
+                              "chosen": true,
+                              "cause": "clustered_pk_chosen_by_heuristics"
+                            },
+                            {
+                              "rows_to_scan": 10000,
+                              "filtering_effect": [
+                              ],
+                              "final_filtering_effect": 1,
+                              "access_type": "scan",
+                              "using_join_cache": true,
+                              "buffers_needed": 2,
+                              "resulting_rows": 10000,
+                              "cost": 8.89e7,
+                              "chosen": false
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 100,
+                        "rows_for_plan": 88880,
+                        "cost_for_plan": 69025,
+                        "semijoin_strategy_choice": [
+                          {
+                            "strategy": "LooseScan",
+                            "recalculate_access_paths_and_cost": {
+                              "tables": [
+                                {
+                                  "table": "`part`",
+                                  "best_access_path": {
+                                    "considered_access_paths": [
+                                      {
+                                        "access_type": "ref",
+                                        "index": "PRIMARY",
+                                        "usable": false,
+                                        "chosen": false
+                                      },
+                                      {
+                                        "rows_to_scan": 200000,
+                                        "filtering_effect": [
+                                        ],
+                                        "final_filtering_effect": 0.1111,
+                                        "access_type": "scan",
+                                        "resulting_rows": 22220,
+                                        "cost": 20489,
+                                        "chosen": true
+                                      }
+                                    ]
+                                  },
+                                  "unknown_key_1": {
+                                    "searching_loose_scan_index": {
+                                      "indexes": [
+                                        {
+                                          "index": "PRIMARY",
+                                          "index_handles_needed_semijoin_equalities": false
+                                        }
+                                      ]
+                                    }
+                                  }
+                                }
+                              ]
+                            },
+                            "chosen": false
+                          },
+                          {
+                            "strategy": "MaterializeScan",
+                            "recalculate_access_paths_and_cost": {
+                              "tables": [
+                                {
+                                  "table": "`supplier`",
+                                  "best_access_path": {
+                                    "considered_access_paths": [
+                                      {
+                                        "access_type": "eq_ref",
+                                        "index": "PRIMARY",
+                                        "rows": 1,
+                                        "cost": 31108,
+                                        "chosen": true,
+                                        "cause": "clustered_pk_chosen_by_heuristics"
+                                      },
+                                      {
+                                        "rows_to_scan": 10000,
+                                        "filtering_effect": [
+                                        ],
+                                        "final_filtering_effect": 1,
+                                        "access_type": "scan",
+                                        "using_join_cache": true,
+                                        "buffers_needed": 2,
+                                        "resulting_rows": 10000,
+                                        "cost": 8.89e7,
+                                        "chosen": false
+                                      }
+                                    ]
+                                  }
+                                }
+                              ]
+                            },
+                            "cost": 86802,
+                            "rows": 1,
+                            "duplicate_tables_left": true,
+                            "chosen": true
+                          },
+                          {
+                            "strategy": "DuplicatesWeedout",
+                            "cost": 78914,
+                            "rows": 10000,
+                            "duplicate_tables_left": false,
+                            "chosen": true
+                          }
+                        ],
+                        "pruned_by_cost": true
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "plan_prefix": [
+                ],
+                "table": "`partsupp`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "access_type": "ref",
+                      "index": "PRIMARY",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "access_type": "ref",
+                      "index": "i_ps_partkey",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "access_type": "ref",
+                      "index": "i_ps_suppkey",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "rows_to_scan": 800000,
+                      "filtering_effect": [
+                      ],
+                      "final_filtering_effect": 1,
+                      "access_type": "scan",
+                      "resulting_rows": 800000,
+                      "cost": 84814,
+                      "chosen": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 800000,
+                "cost_for_plan": 84814,
+                "semijoin_strategy_choice": [
+                ],
+                "pruned_by_cost": true
+              },
+              {
+                "final_semijoin_strategy": "MaterializeLookup"
+              }
+            ]
+          },
+          {
+            "creating_tmp_table": {
+              "tmp_table_info": {
+                "columns": 1,
+                "row_length": 5,
+                "key_length": 4,
+                "unique_constraint": false,
+                "makes_grouped_rows": false,
+                "cannot_insert_duplicates": true,
+                "location": "TempTable"
+              }
+            }
+          },
+          {
+            "attaching_conditions_to_tables": {
+              "original_condition": "((`<subquery2>`.`ps_suppkey` = `supplier`.`s_suppkey`) and (`partsupp`.`ps_partkey` = `part`.`p_partkey`) and (`nation`.`n_name` = 'SAUDI ARABIA') and (`supplier`.`s_nationkey` = `nation`.`n_nationkey`) and (`part`.`p_name` like 'grey%') and (`partsupp`.`ps_availqty` > (/* select#3 */ select (0.5 * sum(`lineitem`.`l_quantity`)) from `lineitem` where ((`lineitem`.`l_partkey` = `partsupp`.`ps_partkey`) and (`lineitem`.`l_suppkey` = `partsupp`.`ps_suppkey`) and (`lineitem`.`l_shipDATE` >= '1995-01-01') and (`lineitem`.`l_shipDATE` < ('1995-01-01' + interval '1' year))))))",
+              "attached_conditions_computation": [
+                {
+                  "table": "`part`",
+                  "rechecking_index_usage": {
+                    "recheck_reason": "not_first_table",
+                    "range_analysis": {
+                      "table_scan": {
+                        "rows": 200000,
+                        "cost": 20491
+                      },
+                      "potential_range_indexes": [
+                        {
+                          "index": "PRIMARY",
+                          "usable": true,
+                          "key_parts": [
+                            "p_partkey"
+                          ]
+                        }
+                      ],
+                      "setup_range_conditions": [
+                      ],
+                      "group_index_range": {
+                        "chosen": false,
+                        "cause": "not_single_table"
+                      },
+                      "skip_scan_range": {
+                        "chosen": false,
+                        "cause": "not_single_table"
+                      }
+                    }
+                  }
+                }
+              ],
+              "attached_conditions_summary": [
+                {
+                  "table": "`nation`",
+                  "attached": "(`nation`.`n_name` = 'SAUDI ARABIA')"
+                },
+                {
+                  "table": "`supplier`",
+                  "attached": "(`supplier`.`s_suppkey` is not null)"
+                },
+                {
+                  "table": "``.`<subquery2>`",
+                  "attached": null
+                },
+                {
+                  "table": "`part`",
+                  "attached": "(`part`.`p_name` like 'grey%')"
+                },
+                {
+                  "table": "`partsupp`",
+                  "attached": "(`partsupp`.`ps_availqty` > (/* select#3 */ select (0.5 * sum(`lineitem`.`l_quantity`)) from `lineitem` where ((`lineitem`.`l_partkey` = `partsupp`.`ps_partkey`) and (`lineitem`.`l_suppkey` = `partsupp`.`ps_suppkey`) and (`lineitem`.`l_shipDATE` >= '1995-01-01') and (`lineitem`.`l_shipDATE` < ('1995-01-01' + interval '1' year)))))"
+                }
+              ]
+            }
+          },
+          {
+            "optimizing_distinct_group_by_order_by": {
+              "simplifying_order_by": {
+                "original_clause": "`supplier`.`s_name`",
+                "items": [
+                  {
+                    "item": "`supplier`.`s_name`"
+                  }
+                ],
+                "resulting_clause_is_simple": false,
+                "resulting_clause": "`supplier`.`s_name`"
+              }
+            }
+          },
+          {
+            "refine_plan": [
+              {
+                "table": "`nation`"
+              },
+              {
+                "table": "`supplier`",
+                "pushed_index_condition": "(`supplier`.`s_suppkey` is not null)",
+                "table_condition_attached": null
+              },
+              {
+                "table": "``.`<subquery2>`"
+              },
+              {
+                "table": "`part`"
+              },
+              {
+                "table": "`partsupp`"
+              }
+            ]
+          },
+          {
+            "considering_tmp_tables": [
+              {
+                "adding_tmp_table_in_plan_at_position": 3,
+                "write_method": "write_all_rows"
+              },
+              {
+                "adding_sort_to_table_in_plan_at_position": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "join_optimization": {
+        "select#": 3,
+        "steps": [
+          {
+            "condition_processing": {
+              "condition": "WHERE",
+              "original_condition": "((`lineitem`.`l_partkey` = `partsupp`.`ps_partkey`) and (`lineitem`.`l_suppkey` = `partsupp`.`ps_suppkey`) and (`lineitem`.`l_shipDATE` >= '1995-01-01') and (`lineitem`.`l_shipDATE` < ('1995-01-01' + interval '1' year)))",
+              "steps": [
+                {
+                  "transformation": "equality_propagation",
+                  "resulting_condition": "((`lineitem`.`l_partkey` = `partsupp`.`ps_partkey`) and (`lineitem`.`l_suppkey` = `partsupp`.`ps_suppkey`) and (`lineitem`.`l_shipDATE` >= '1995-01-01') and (`lineitem`.`l_shipDATE` < ('1995-01-01' + interval '1' year)))"
+                },
+                {
+                  "transformation": "constant_propagation",
+                  "resulting_condition": "((`lineitem`.`l_partkey` = `partsupp`.`ps_partkey`) and (`lineitem`.`l_suppkey` = `partsupp`.`ps_suppkey`) and (`lineitem`.`l_shipDATE` >= '1995-01-01') and (`lineitem`.`l_shipDATE` < ('1995-01-01' + interval '1' year)))"
+                },
+                {
+                  "transformation": "trivial_condition_removal",
+                  "resulting_condition": "((`lineitem`.`l_partkey` = `partsupp`.`ps_partkey`) and (`lineitem`.`l_suppkey` = `partsupp`.`ps_suppkey`) and (`lineitem`.`l_shipDATE` >= '1995-01-01') and (`lineitem`.`l_shipDATE` < ('1995-01-01' + interval '1' year)))"
+                }
+              ]
+            }
+          },
+          {
+            "substitute_generated_columns": {
+            }
+          },
+          {
+            "table_dependencies": [
+              {
+                "table": "`lineitem`",
+                "row_may_be_null": false,
+                "map_bit": 0,
+                "depends_on_map_bits": [
+                ]
+              }
+            ]
+          },
+          {
+            "ref_optimizer_key_uses": [
+              {
+                "table": "`lineitem`",
+                "field": "l_partkey",
+                "equals": "`partsupp`.`ps_partkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`lineitem`",
+                "field": "l_suppkey",
+                "equals": "`partsupp`.`ps_suppkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`lineitem`",
+                "field": "l_partkey",
+                "equals": "`partsupp`.`ps_partkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`lineitem`",
+                "field": "l_suppkey",
+                "equals": "`partsupp`.`ps_suppkey`",
+                "null_rejecting": false
+              }
+            ]
+          },
+          {
+            "rows_estimation": [
+              {
+                "table": "`lineitem`",
+                "range_analysis": {
+                  "table_scan": {
+                    "rows": 6001215,
+                    "cost": 613024
+                  },
+                  "potential_range_indexes": [
+                    {
+                      "index": "PRIMARY",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_l_shipdate",
+                      "usable": true,
+                      "key_parts": [
+                        "l_shipDATE",
+                        "l_orderkey",
+                        "l_linenumber"
+                      ]
+                    },
+                    {
+                      "index": "i_l_partkey_suppkey",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_l_partkey",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_l_suppkey",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_l_receiptdate",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_l_orderkey",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_l_orderkey_quantity",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_l_commitdate",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    }
+                  ],
+                  "setup_range_conditions": [
+                  ],
+                  "group_index_range": {
+                    "chosen": false,
+                    "cause": "not_group_by_or_distinct"
+                  },
+                  "skip_scan_range": {
+                    "potential_skip_scan_indexes": [
+                      {
+                        "index": "i_l_shipdate",
+                        "usable": false,
+                        "cause": "query_references_nonkey_column"
+                      }
+                    ]
+                  },
+                  "analyzing_range_alternatives": {
+                    "range_scan_alternatives": [
+                      {
+                        "index": "i_l_shipdate",
+                        "ranges": [
+                          "0x21960f <= l_shipDATE < 0x21980f"
+                        ],
+                        "index_dives_for_eq_ranges": true,
+                        "rowid_ordered": false,
+                        "using_mrr": false,
+                        "index_only": false,
+                        "rows": 1818900,
+                        "cost": 636774,
+                        "chosen": false,
+                        "cause": "cost"
+                      }
+                    ],
+                    "analyzing_roworder_intersect": {
+                      "usable": false,
+                      "cause": "too_few_roworder_scans"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "considered_execution_plans": [
+              {
+                "plan_prefix": [
+                ],
+                "table": "`lineitem`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "access_type": "ref",
+                      "index": "i_l_partkey_suppkey",
+                      "rows": 7.5058,
+                      "cost": 2.6277,
+                      "chosen": true
+                    },
+                    {
+                      "access_type": "ref",
+                      "index": "i_l_partkey",
+                      "rows": 30.006,
+                      "cost": 10.505,
+                      "chosen": false
+                    },
+                    {
+                      "access_type": "ref",
+                      "index": "i_l_suppkey",
+                      "rows": 600.12,
+                      "cost": 210.1,
+                      "chosen": false
+                    },
+                    {
+                      "access_type": "scan",
+                      "cost": 613022,
+                      "rows": 6001215,
+                      "chosen": false,
+                      "cause": "cost"
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 30.309,
+                "rows_for_plan": 2.2749,
+                "cost_for_plan": 2.6277,
+                "chosen": true
+              }
+            ]
+          },
+          {
+            "attaching_conditions_to_tables": {
+              "original_condition": "((`lineitem`.`l_partkey` = `partsupp`.`ps_partkey`) and (`lineitem`.`l_suppkey` = `partsupp`.`ps_suppkey`) and (`lineitem`.`l_shipDATE` >= '1995-01-01') and (`lineitem`.`l_shipDATE` < ('1995-01-01' + interval '1' year)))",
+              "attached_conditions_computation": [
+              ],
+              "attached_conditions_summary": [
+                {
+                  "table": "`lineitem`",
+                  "attached": "((`lineitem`.`l_shipDATE` >= '1995-01-01') and (`lineitem`.`l_shipDATE` < ('1995-01-01' + interval '1' year)))"
+                }
+              ]
+            }
+          },
+          {
+            "optimizing_distinct_group_by_order_by": {
+            }
+          },
+          {
+            "refine_plan": [
+              {
+                "table": "`lineitem`"
+              }
+            ]
+          },
+          {
+            "considering_tmp_tables": [
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "join_execution": {
+        "select#": 1,
+        "steps": [
+          {
+            "subselect_execution": {
+              "select#": 3,
+              "steps": [
+                {
+                  "join_execution": {
+                    "select#": 3,
+                    "steps": [
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "creating_tmp_table": {
+              "tmp_table_info": {
+                "table": "intermediate_tmp_table",
+                "in_plan_at_position": 3,
+                "columns": 2,
+                "row_length": 67,
+                "key_length": 0,
+                "unique_constraint": false,
+                "makes_grouped_rows": false,
+                "cannot_insert_duplicates": false,
+                "location": "TempTable"
+              }
+            }
+          },
+          {
+            "sorting_table_in_plan_at_position": 3,
+            "filesort_information": [
+              {
+                "direction": "asc",
+                "table": "intermediate_tmp_table",
+                "field": "s_name"
+              }
+            ],
+            "filesort_priority_queue_optimization": {
+              "usable": false,
+              "cause": "not applicable (no LIMIT)"
+            },
+            "filesort_execution": [
+            ],
+            "filesort_summary": {
+              "memory_available": 262144,
+              "key_size": 34,
+              "row_size": 34,
+              "max_rows_per_buffer": 192,
+              "num_rows_estimate": 192,
+              "num_rows_found": 182,
+              "num_initial_chunks_spilled_to_disk": 0,
+              "peak_memory_used": 34816,
+              "sort_algorithm": "std::stable_sort",
+              "unpacked_addon_fields": "using_heap_table",
+              "sort_mode": "<fixed_sort_key, rowid>"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,446 @@
+{
+  "steps": [
+    {
+      "join_preparation": {
+        "select#": 1,
+        "steps": [
+          {
+            "join_preparation": {
+              "select#": 2,
+              "steps": [
+                {
+                  "expanded_query": "/* select#2 */ select 1 from `lineitem` where ((`lineitem`.`l_orderkey` = `orders`.`o_orderkey`) and (`lineitem`.`l_commitDATE` < `lineitem`.`l_receiptDATE`))"
+                }
+              ]
+            }
+          },
+          {
+            "expanded_query": "/* select#1 */ select `orders`.`o_orderpriority` AS `o_orderpriority`,count(0) AS `order_count` from `orders` where ((`orders`.`o_orderDATE` >= '1994-02-01') and (`orders`.`o_orderDATE` < ('1994-02-01' + interval '3' month)) and exists(/* select#2 */ select 1 from `lineitem` where ((`lineitem`.`l_orderkey` = `orders`.`o_orderkey`) and (`lineitem`.`l_commitDATE` < `lineitem`.`l_receiptDATE`)))) group by `orders`.`o_orderpriority` order by `orders`.`o_orderpriority`"
+          }
+        ]
+      }
+    },
+    {
+      "join_optimization": {
+        "select#": 1,
+        "steps": [
+          {
+            "condition_processing": {
+              "condition": "WHERE",
+              "original_condition": "((`orders`.`o_orderDATE` >= '1994-02-01') and (`orders`.`o_orderDATE` < ('1994-02-01' + interval '3' month)) and exists(/* select#2 */ select 1 from `lineitem` where ((`lineitem`.`l_orderkey` = `orders`.`o_orderkey`) and (`lineitem`.`l_commitDATE` < `lineitem`.`l_receiptDATE`))))",
+              "steps": [
+                {
+                  "transformation": "equality_propagation",
+                  "subselect_evaluation": [
+                  ],
+                  "resulting_condition": "((`orders`.`o_orderDATE` >= '1994-02-01') and (`orders`.`o_orderDATE` < ('1994-02-01' + interval '3' month)) and exists(/* select#2 */ select 1 from `lineitem` where ((`lineitem`.`l_orderkey` = `orders`.`o_orderkey`) and (`lineitem`.`l_commitDATE` < `lineitem`.`l_receiptDATE`))))"
+                },
+                {
+                  "transformation": "constant_propagation",
+                  "subselect_evaluation": [
+                  ],
+                  "resulting_condition": "((`orders`.`o_orderDATE` >= '1994-02-01') and (`orders`.`o_orderDATE` < ('1994-02-01' + interval '3' month)) and exists(/* select#2 */ select 1 from `lineitem` where ((`lineitem`.`l_orderkey` = `orders`.`o_orderkey`) and (`lineitem`.`l_commitDATE` < `lineitem`.`l_receiptDATE`))))"
+                },
+                {
+                  "transformation": "trivial_condition_removal",
+                  "subselect_evaluation": [
+                  ],
+                  "resulting_condition": "((`orders`.`o_orderDATE` >= '1994-02-01') and (`orders`.`o_orderDATE` < ('1994-02-01' + interval '3' month)) and exists(/* select#2 */ select 1 from `lineitem` where ((`lineitem`.`l_orderkey` = `orders`.`o_orderkey`) and (`lineitem`.`l_commitDATE` < `lineitem`.`l_receiptDATE`))))"
+                }
+              ]
+            }
+          },
+          {
+            "substitute_generated_columns": {
+            }
+          },
+          {
+            "table_dependencies": [
+              {
+                "table": "`orders`",
+                "row_may_be_null": false,
+                "map_bit": 0,
+                "depends_on_map_bits": [
+                ]
+              }
+            ]
+          },
+          {
+            "ref_optimizer_key_uses": [
+            ]
+          },
+          {
+            "rows_estimation": [
+              {
+                "table": "`orders`",
+                "range_analysis": {
+                  "table_scan": {
+                    "rows": 1500000,
+                    "cost": 152973
+                  },
+                  "potential_range_indexes": [
+                    {
+                      "index": "PRIMARY",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_o_orderdate",
+                      "usable": true,
+                      "key_parts": [
+                        "o_orderDATE",
+                        "o_orderkey"
+                      ]
+                    },
+                    {
+                      "index": "i_o_custkey",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    }
+                  ],
+                  "setup_range_conditions": [
+                  ],
+                  "group_index_range": {
+                    "chosen": false,
+                    "cause": "not_applicable_aggregate_function"
+                  },
+                  "skip_scan_range": {
+                    "chosen": false,
+                    "cause": "has_group_by"
+                  },
+                  "analyzing_range_alternatives": {
+                    "range_scan_alternatives": [
+                      {
+                        "index": "i_o_orderdate",
+                        "ranges": [
+                          "0x41940f <= o_orderDATE < 0xa1940f"
+                        ],
+                        "index_dives_for_eq_ranges": true,
+                        "rowid_ordered": false,
+                        "using_mrr": false,
+                        "index_only": false,
+                        "rows": 109368,
+                        "cost": 38279,
+                        "chosen": true
+                      }
+                    ],
+                    "analyzing_roworder_intersect": {
+                      "usable": false,
+                      "cause": "too_few_roworder_scans"
+                    }
+                  },
+                  "chosen_range_access_summary": {
+                    "range_access_plan": {
+                      "type": "range_scan",
+                      "index": "i_o_orderdate",
+                      "rows": 109368,
+                      "ranges": [
+                        "0x41940f <= o_orderDATE < 0xa1940f"
+                      ]
+                    },
+                    "rows_for_plan": 109368,
+                    "cost_for_plan": 38279,
+                    "chosen": true
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "considered_execution_plans": [
+              {
+                "plan_prefix": [
+                ],
+                "table": "`orders`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "rows_to_scan": 109368,
+                      "access_type": "range",
+                      "range_details": {
+                        "used_index": "i_o_orderdate"
+                      },
+                      "resulting_rows": 109368,
+                      "cost": 49216,
+                      "chosen": true,
+                      "use_tmp_table": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 109368,
+                "cost_for_plan": 49216,
+                "sort_cost": 109368,
+                "new_cost_for_plan": 158584,
+                "chosen": true
+              }
+            ]
+          },
+          {
+            "attaching_conditions_to_tables": {
+              "original_condition": "((`orders`.`o_orderDATE` >= '1994-02-01') and (`orders`.`o_orderDATE` < ('1994-02-01' + interval '3' month)) and exists(/* select#2 */ select 1 from `lineitem` where ((`lineitem`.`l_orderkey` = `orders`.`o_orderkey`) and (`lineitem`.`l_commitDATE` < `lineitem`.`l_receiptDATE`))))",
+              "attached_conditions_computation": [
+              ],
+              "attached_conditions_summary": [
+                {
+                  "table": "`orders`",
+                  "attached": "((`orders`.`o_orderDATE` >= '1994-02-01') and (`orders`.`o_orderDATE` < ('1994-02-01' + interval '3' month)) and exists(/* select#2 */ select 1 from `lineitem` where ((`lineitem`.`l_orderkey` = `orders`.`o_orderkey`) and (`lineitem`.`l_commitDATE` < `lineitem`.`l_receiptDATE`))))"
+                }
+              ]
+            }
+          },
+          {
+            "optimizing_distinct_group_by_order_by": {
+              "simplifying_order_by": {
+                "original_clause": "`orders`.`o_orderpriority`",
+                "items": [
+                  {
+                    "item": "`orders`.`o_orderpriority`"
+                  }
+                ],
+                "resulting_clause_is_simple": true,
+                "resulting_clause": "`orders`.`o_orderpriority`"
+              },
+              "simplifying_group_by": {
+                "original_clause": "`orders`.`o_orderpriority`",
+                "items": [
+                  {
+                    "item": "`orders`.`o_orderpriority`"
+                  }
+                ],
+                "resulting_clause_is_simple": true,
+                "resulting_clause": "`orders`.`o_orderpriority`"
+              },
+              "removed_order_by": true
+            }
+          },
+          {
+            "refine_plan": [
+              {
+                "table": "`orders`",
+                "pushed_index_condition": "((`orders`.`o_orderDATE` >= '1994-02-01') and (`orders`.`o_orderDATE` < <cache>(('1994-02-01' + interval '3' month))))",
+                "table_condition_attached": "exists(/* select#2 */ select 1 from `lineitem` where ((`lineitem`.`l_orderkey` = `orders`.`o_orderkey`) and (`lineitem`.`l_commitDATE` < `lineitem`.`l_receiptDATE`)))"
+              }
+            ]
+          },
+          {
+            "considering_tmp_tables": [
+              {
+                "adding_tmp_table_in_plan_at_position": 1,
+                "write_method": "continuously_update_group_row"
+              },
+              {
+                "adding_sort_to_table_in_plan_at_position": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "join_optimization": {
+        "select#": 2,
+        "steps": [
+          {
+            "condition_processing": {
+              "condition": "WHERE",
+              "original_condition": "((`lineitem`.`l_orderkey` = `orders`.`o_orderkey`) and (`lineitem`.`l_commitDATE` < `lineitem`.`l_receiptDATE`))",
+              "steps": [
+                {
+                  "transformation": "equality_propagation",
+                  "resulting_condition": "((`lineitem`.`l_orderkey` = `orders`.`o_orderkey`) and (`lineitem`.`l_commitDATE` < `lineitem`.`l_receiptDATE`))"
+                },
+                {
+                  "transformation": "constant_propagation",
+                  "resulting_condition": "((`lineitem`.`l_orderkey` = `orders`.`o_orderkey`) and (`lineitem`.`l_commitDATE` < `lineitem`.`l_receiptDATE`))"
+                },
+                {
+                  "transformation": "trivial_condition_removal",
+                  "resulting_condition": "((`lineitem`.`l_orderkey` = `orders`.`o_orderkey`) and (`lineitem`.`l_commitDATE` < `lineitem`.`l_receiptDATE`))"
+                }
+              ]
+            }
+          },
+          {
+            "substitute_generated_columns": {
+            }
+          },
+          {
+            "table_dependencies": [
+              {
+                "table": "`lineitem`",
+                "row_may_be_null": false,
+                "map_bit": 0,
+                "depends_on_map_bits": [
+                ]
+              }
+            ]
+          },
+          {
+            "ref_optimizer_key_uses": [
+              {
+                "table": "`lineitem`",
+                "field": "l_orderkey",
+                "equals": "`orders`.`o_orderkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`lineitem`",
+                "field": "l_orderkey",
+                "equals": "`orders`.`o_orderkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`lineitem`",
+                "field": "l_orderkey",
+                "equals": "`orders`.`o_orderkey`",
+                "null_rejecting": false
+              }
+            ]
+          },
+          {
+            "rows_estimation": [
+              {
+                "table": "`lineitem`",
+                "table_scan": {
+                  "rows": 6001215,
+                  "cost": 12901
+                }
+              }
+            ]
+          },
+          {
+            "considered_execution_plans": [
+              {
+                "plan_prefix": [
+                ],
+                "table": "`lineitem`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "access_type": "ref",
+                      "index": "PRIMARY",
+                      "rows": 4.0008,
+                      "cost": 0.6533,
+                      "chosen": true
+                    },
+                    {
+                      "access_type": "ref",
+                      "index": "i_l_orderkey",
+                      "rows": 4.0008,
+                      "cost": 1.4006,
+                      "chosen": false
+                    },
+                    {
+                      "access_type": "ref",
+                      "index": "i_l_orderkey_quantity",
+                      "rows": 4.0008,
+                      "cost": 1.4006,
+                      "chosen": false
+                    },
+                    {
+                      "access_type": "scan",
+                      "cost": 613022,
+                      "rows": 6001215,
+                      "chosen": false,
+                      "cause": "cost"
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 33.33,
+                "rows_for_plan": 1.3335,
+                "cost_for_plan": 0.6533,
+                "chosen": true
+              }
+            ]
+          },
+          {
+            "attaching_conditions_to_tables": {
+              "original_condition": "((`lineitem`.`l_orderkey` = `orders`.`o_orderkey`) and (`lineitem`.`l_commitDATE` < `lineitem`.`l_receiptDATE`))",
+              "attached_conditions_computation": [
+              ],
+              "attached_conditions_summary": [
+                {
+                  "table": "`lineitem`",
+                  "attached": "(`lineitem`.`l_commitDATE` < `lineitem`.`l_receiptDATE`)"
+                }
+              ]
+            }
+          },
+          {
+            "refine_plan": [
+              {
+                "table": "`lineitem`"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "join_execution": {
+        "select#": 1,
+        "steps": [
+          {
+            "subselect_execution": {
+              "select#": 2,
+              "steps": [
+                {
+                  "join_execution": {
+                    "select#": 2,
+                    "steps": [
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "creating_tmp_table": {
+              "tmp_table_info": {
+                "table": "intermediate_tmp_table",
+                "in_plan_at_position": 1,
+                "columns": 2,
+                "row_length": 25,
+                "key_length": 16,
+                "unique_constraint": false,
+                "makes_grouped_rows": true,
+                "cannot_insert_duplicates": false,
+                "location": "TempTable"
+              }
+            }
+          },
+          {
+            "sorting_table_in_plan_at_position": 1,
+            "filesort_information": [
+              {
+                "direction": "asc",
+                "table": "intermediate_tmp_table",
+                "field": "o_orderpriority"
+              }
+            ],
+            "filesort_priority_queue_optimization": {
+              "usable": false,
+              "cause": "not applicable (no LIMIT)"
+            },
+            "filesort_execution": [
+            ],
+            "filesort_summary": {
+              "memory_available": 262144,
+              "key_size": 24,
+              "row_size": 24,
+              "max_rows_per_buffer": 15,
+              "num_rows_estimate": 15,
+              "num_rows_found": 5,
+              "num_initial_chunks_spilled_to_disk": 0,
+              "peak_memory_used": 32832,
+              "sort_algorithm": "std::sort",
+              "unpacked_addon_fields": "using_heap_table",
+              "sort_mode": "<fixed_sort_key, rowid>"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

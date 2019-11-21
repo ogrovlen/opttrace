@@ -1,0 +1,517 @@
+{
+  "steps": [
+    {
+      "join_preparation": {
+        "select#": 1,
+        "steps": [
+          {
+            "join_preparation": {
+              "select#": 2,
+              "steps": [
+                {
+                  "IN_uses_bisection": true
+                },
+                {
+                  "join_preparation": {
+                    "select#": 3,
+                    "steps": [
+                      {
+                        "IN_uses_bisection": true
+                      },
+                      {
+                        "expanded_query": "/* select#3 */ select avg(`customer`.`c_acctbal`) from `customer` where ((`customer`.`c_acctbal` > 0.00) and (substr(`customer`.`c_phone`,1,2) in ('30','11','15','23','20','25','27')))"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "join_preparation": {
+                    "select#": 4,
+                    "steps": [
+                      {
+                        "expanded_query": "/* select#4 */ select 1 from `orders` where (`orders`.`o_custkey` = `customer`.`c_custkey`)"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "expanded_query": "/* select#2 */ select substr(`customer`.`c_phone`,1,2) AS `cntrycode`,`customer`.`c_acctbal` AS `c_acctbal` from `customer` where ((substr(`customer`.`c_phone`,1,2) in ('30','11','15','23','20','25','27')) and (`customer`.`c_acctbal` > (/* select#3 */ select avg(`customer`.`c_acctbal`) from `customer` where ((`customer`.`c_acctbal` > 0.00) and (substr(`customer`.`c_phone`,1,2) in ('30','11','15','23','20','25','27'))))) and (not(exists(/* select#4 */ select 1 from `orders` where (`orders`.`o_custkey` = `customer`.`c_custkey`)))))"
+                }
+              ]
+            }
+          },
+          {
+            "derived": {
+              "table": "``.`` `vip`",
+              "select#": 2,
+              "merged": true
+            }
+          },
+          {
+            "expanded_query": "/* select#1 */ select substr(`customer`.`c_phone`,1,2) AS `cntrycode`,count(0) AS `numcust`,sum(`customer`.`c_acctbal`) AS `totacctbal` from (`customer`) group by `cntrycode` order by `cntrycode`"
+          },
+          {
+            "transformations_to_nested_joins": {
+              "transformations": [
+                "JOIN_condition_to_WHERE",
+                "parenthesis_removal"
+              ],
+              "expanded_query": "/* select#1 */ select substr(`customer`.`c_phone`,1,2) AS `cntrycode`,count(0) AS `numcust`,sum(`customer`.`c_acctbal`) AS `totacctbal` from `customer` where ((substr(`customer`.`c_phone`,1,2) in ('30','11','15','23','20','25','27')) and (`customer`.`c_acctbal` > (/* select#3 */ select avg(`customer`.`c_acctbal`) from `customer` where ((`customer`.`c_acctbal` > 0.00) and (substr(`customer`.`c_phone`,1,2) in ('30','11','15','23','20','25','27'))))) and (not(exists(/* select#4 */ select 1 from `orders` where (`orders`.`o_custkey` = `customer`.`c_custkey`))))) group by `cntrycode` order by `cntrycode`"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "join_optimization": {
+        "select#": 1,
+        "steps": [
+          {
+            "condition_processing": {
+              "condition": "WHERE",
+              "original_condition": "((substr(`customer`.`c_phone`,1,2) in ('30','11','15','23','20','25','27')) and (`customer`.`c_acctbal` > (/* select#3 */ select avg(`customer`.`c_acctbal`) from `customer` where ((`customer`.`c_acctbal` > 0.00) and (substr(`customer`.`c_phone`,1,2) in ('30','11','15','23','20','25','27'))))) and (not(exists(/* select#4 */ select 1 from `orders` where (`orders`.`o_custkey` = `customer`.`c_custkey`)))))",
+              "steps": [
+                {
+                  "transformation": "equality_propagation",
+                  "subselect_evaluation": [
+                  ],
+                  "resulting_condition": "((substr(`customer`.`c_phone`,1,2) in ('30','11','15','23','20','25','27')) and (`customer`.`c_acctbal` > (/* select#3 */ select avg(`customer`.`c_acctbal`) from `customer` where ((`customer`.`c_acctbal` > 0.00) and (substr(`customer`.`c_phone`,1,2) in ('30','11','15','23','20','25','27'))))) and (not(exists(/* select#4 */ select 1 from `orders` where (`orders`.`o_custkey` = `customer`.`c_custkey`)))))"
+                },
+                {
+                  "transformation": "constant_propagation",
+                  "subselect_evaluation": [
+                  ],
+                  "resulting_condition": "((substr(`customer`.`c_phone`,1,2) in ('30','11','15','23','20','25','27')) and (`customer`.`c_acctbal` > (/* select#3 */ select avg(`customer`.`c_acctbal`) from `customer` where ((`customer`.`c_acctbal` > 0.00) and (substr(`customer`.`c_phone`,1,2) in ('30','11','15','23','20','25','27'))))) and (not(exists(/* select#4 */ select 1 from `orders` where (`orders`.`o_custkey` = `customer`.`c_custkey`)))))"
+                },
+                {
+                  "transformation": "trivial_condition_removal",
+                  "subselect_evaluation": [
+                  ],
+                  "resulting_condition": "((substr(`customer`.`c_phone`,1,2) in ('30','11','15','23','20','25','27')) and (`customer`.`c_acctbal` > (/* select#3 */ select avg(`customer`.`c_acctbal`) from `customer` where ((`customer`.`c_acctbal` > 0.00) and (substr(`customer`.`c_phone`,1,2) in ('30','11','15','23','20','25','27'))))) and (not(exists(/* select#4 */ select 1 from `orders` where (`orders`.`o_custkey` = `customer`.`c_custkey`)))))"
+                }
+              ]
+            }
+          },
+          {
+            "substitute_generated_columns": {
+            }
+          },
+          {
+            "table_dependencies": [
+              {
+                "table": "`customer`",
+                "row_may_be_null": false,
+                "map_bit": 0,
+                "depends_on_map_bits": [
+                ]
+              }
+            ]
+          },
+          {
+            "ref_optimizer_key_uses": [
+            ]
+          },
+          {
+            "rows_estimation": [
+              {
+                "table": "`customer`",
+                "table_scan": {
+                  "rows": 150000,
+                  "cost": 441
+                }
+              }
+            ]
+          },
+          {
+            "considered_execution_plans": [
+              {
+                "plan_prefix": [
+                ],
+                "table": "`customer`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "rows_to_scan": 150000,
+                      "access_type": "scan",
+                      "resulting_rows": 150000,
+                      "cost": 15441,
+                      "chosen": true,
+                      "use_tmp_table": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 150000,
+                "cost_for_plan": 15441,
+                "sort_cost": 150000,
+                "new_cost_for_plan": 165441,
+                "chosen": true
+              }
+            ]
+          },
+          {
+            "attaching_conditions_to_tables": {
+              "original_condition": "((substr(`customer`.`c_phone`,1,2) in ('30','11','15','23','20','25','27')) and (`customer`.`c_acctbal` > (/* select#3 */ select avg(`customer`.`c_acctbal`) from `customer` where ((`customer`.`c_acctbal` > 0.00) and (substr(`customer`.`c_phone`,1,2) in ('30','11','15','23','20','25','27'))))) and (not(exists(/* select#4 */ select 1 from `orders` where (`orders`.`o_custkey` = `customer`.`c_custkey`)))))",
+              "attached_conditions_computation": [
+              ],
+              "attached_conditions_summary": [
+                {
+                  "table": "`customer`",
+                  "attached": "((substr(`customer`.`c_phone`,1,2) in ('30','11','15','23','20','25','27')) and (`customer`.`c_acctbal` > (/* select#3 */ select avg(`customer`.`c_acctbal`) from `customer` where ((`customer`.`c_acctbal` > 0.00) and (substr(`customer`.`c_phone`,1,2) in ('30','11','15','23','20','25','27'))))) and (not(exists(/* select#4 */ select 1 from `orders` where (`orders`.`o_custkey` = `customer`.`c_custkey`)))))"
+                }
+              ]
+            }
+          },
+          {
+            "optimizing_distinct_group_by_order_by": {
+              "simplifying_order_by": {
+                "original_clause": "`cntrycode`",
+                "items": [
+                  {
+                    "item": "substr(`customer`.`c_phone`,1,2)"
+                  }
+                ],
+                "resulting_clause_is_simple": true,
+                "resulting_clause": "`cntrycode`"
+              },
+              "simplifying_group_by": {
+                "original_clause": "`cntrycode`",
+                "items": [
+                  {
+                    "item": "substr(`customer`.`c_phone`,1,2)"
+                  }
+                ],
+                "resulting_clause_is_simple": true,
+                "resulting_clause": "`cntrycode`"
+              },
+              "removed_order_by": true
+            }
+          },
+          {
+            "refine_plan": [
+              {
+                "table": "`customer`"
+              }
+            ]
+          },
+          {
+            "considering_tmp_tables": [
+              {
+                "adding_tmp_table_in_plan_at_position": 1,
+                "write_method": "continuously_update_group_row"
+              },
+              {
+                "adding_sort_to_table_in_plan_at_position": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "join_optimization": {
+        "select#": 4,
+        "steps": [
+          {
+            "condition_processing": {
+              "condition": "WHERE",
+              "original_condition": "(`orders`.`o_custkey` = `customer`.`c_custkey`)",
+              "steps": [
+                {
+                  "transformation": "equality_propagation",
+                  "resulting_condition": "(`orders`.`o_custkey` = `customer`.`c_custkey`)"
+                },
+                {
+                  "transformation": "constant_propagation",
+                  "resulting_condition": "(`orders`.`o_custkey` = `customer`.`c_custkey`)"
+                },
+                {
+                  "transformation": "trivial_condition_removal",
+                  "resulting_condition": "(`orders`.`o_custkey` = `customer`.`c_custkey`)"
+                }
+              ]
+            }
+          },
+          {
+            "substitute_generated_columns": {
+            }
+          },
+          {
+            "table_dependencies": [
+              {
+                "table": "`orders`",
+                "row_may_be_null": false,
+                "map_bit": 0,
+                "depends_on_map_bits": [
+                ]
+              }
+            ]
+          },
+          {
+            "ref_optimizer_key_uses": [
+              {
+                "table": "`orders`",
+                "field": "o_custkey",
+                "equals": "`customer`.`c_custkey`",
+                "null_rejecting": false
+              }
+            ]
+          },
+          {
+            "rows_estimation": [
+              {
+                "table": "`orders`",
+                "table_scan": {
+                  "rows": 1500000,
+                  "cost": 2971.2
+                }
+              }
+            ]
+          },
+          {
+            "considered_execution_plans": [
+              {
+                "plan_prefix": [
+                ],
+                "table": "`orders`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "access_type": "ref",
+                      "index": "i_o_custkey",
+                      "rows": 15.001,
+                      "cost": 1.7539,
+                      "chosen": true
+                    },
+                    {
+                      "access_type": "scan",
+                      "cost": 152971,
+                      "rows": 1500000,
+                      "chosen": false,
+                      "cause": "cost"
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 15.001,
+                "cost_for_plan": 1.7539,
+                "chosen": true
+              }
+            ]
+          },
+          {
+            "attaching_conditions_to_tables": {
+              "original_condition": "(`orders`.`o_custkey` = `customer`.`c_custkey`)",
+              "attached_conditions_computation": [
+              ],
+              "attached_conditions_summary": [
+                {
+                  "table": "`orders`",
+                  "attached": null
+                }
+              ]
+            }
+          },
+          {
+            "refine_plan": [
+              {
+                "table": "`orders`"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "join_optimization": {
+        "select#": 3,
+        "steps": [
+          {
+            "condition_processing": {
+              "condition": "WHERE",
+              "original_condition": "((`customer`.`c_acctbal` > 0.00) and (substr(`customer`.`c_phone`,1,2) in ('30','11','15','23','20','25','27')))",
+              "steps": [
+                {
+                  "transformation": "equality_propagation",
+                  "resulting_condition": "((`customer`.`c_acctbal` > 0.00) and (substr(`customer`.`c_phone`,1,2) in ('30','11','15','23','20','25','27')))"
+                },
+                {
+                  "transformation": "constant_propagation",
+                  "resulting_condition": "((`customer`.`c_acctbal` > 0.00) and (substr(`customer`.`c_phone`,1,2) in ('30','11','15','23','20','25','27')))"
+                },
+                {
+                  "transformation": "trivial_condition_removal",
+                  "resulting_condition": "((`customer`.`c_acctbal` > 0.00) and (substr(`customer`.`c_phone`,1,2) in ('30','11','15','23','20','25','27')))"
+                }
+              ]
+            }
+          },
+          {
+            "substitute_generated_columns": {
+            }
+          },
+          {
+            "table_dependencies": [
+              {
+                "table": "`customer`",
+                "row_may_be_null": false,
+                "map_bit": 0,
+                "depends_on_map_bits": [
+                ]
+              }
+            ]
+          },
+          {
+            "ref_optimizer_key_uses": [
+            ]
+          },
+          {
+            "rows_estimation": [
+              {
+                "table": "`customer`",
+                "table_scan": {
+                  "rows": 150000,
+                  "cost": 441
+                }
+              }
+            ]
+          },
+          {
+            "considered_execution_plans": [
+              {
+                "plan_prefix": [
+                ],
+                "table": "`customer`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "rows_to_scan": 150000,
+                      "filtering_effect": [
+                      ],
+                      "final_filtering_effect": 0.3333,
+                      "access_type": "scan",
+                      "resulting_rows": 49995,
+                      "cost": 15441,
+                      "chosen": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 49995,
+                "cost_for_plan": 15441,
+                "chosen": true
+              }
+            ]
+          },
+          {
+            "attaching_conditions_to_tables": {
+              "original_condition": "((`customer`.`c_acctbal` > 0.00) and (substr(`customer`.`c_phone`,1,2) in ('30','11','15','23','20','25','27')))",
+              "attached_conditions_computation": [
+              ],
+              "attached_conditions_summary": [
+                {
+                  "table": "`customer`",
+                  "attached": "((`customer`.`c_acctbal` > 0.00) and (substr(`customer`.`c_phone`,1,2) in ('30','11','15','23','20','25','27')))"
+                }
+              ]
+            }
+          },
+          {
+            "optimizing_distinct_group_by_order_by": {
+            }
+          },
+          {
+            "refine_plan": [
+              {
+                "table": "`customer`"
+              }
+            ]
+          },
+          {
+            "considering_tmp_tables": [
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "join_execution": {
+        "select#": 1,
+        "steps": [
+          {
+            "subselect_execution": {
+              "select#": 3,
+              "steps": [
+                {
+                  "join_execution": {
+                    "select#": 3,
+                    "steps": [
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "subselect_execution": {
+              "select#": 4,
+              "steps": [
+                {
+                  "join_execution": {
+                    "select#": 4,
+                    "steps": [
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "creating_tmp_table": {
+              "tmp_table_info": {
+                "table": "intermediate_tmp_table",
+                "in_plan_at_position": 1,
+                "columns": 3,
+                "row_length": 28,
+                "key_length": 5,
+                "unique_constraint": false,
+                "makes_grouped_rows": true,
+                "cannot_insert_duplicates": false,
+                "location": "TempTable"
+              }
+            }
+          },
+          {
+            "sorting_table_in_plan_at_position": 1,
+            "filesort_information": [
+              {
+                "direction": "asc",
+                "table": "intermediate_tmp_table",
+                "field": "cntrycode"
+              }
+            ],
+            "filesort_priority_queue_optimization": {
+              "usable": false,
+              "cause": "not applicable (no LIMIT)"
+            },
+            "filesort_execution": [
+            ],
+            "filesort_summary": {
+              "memory_available": 262144,
+              "key_size": 11,
+              "row_size": 11,
+              "max_rows_per_buffer": 17,
+              "num_rows_estimate": 17,
+              "num_rows_found": 7,
+              "num_initial_chunks_spilled_to_disk": 0,
+              "peak_memory_used": 32832,
+              "sort_algorithm": "std::sort",
+              "unpacked_addon_fields": "using_heap_table",
+              "sort_mode": "<fixed_sort_key, rowid>"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

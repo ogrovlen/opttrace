@@ -28,3 +28,24 @@ Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
     `lineitem` ref:PRIMARY 1.0155/150.86 435.76/1148.9 *** NEW BEST PLAN ***
   `lineitem` ref:PRIMARY 1.0155/745.63 2153.8/1001.3 PRUNED(heuristic)
 ```
+
+Also included is a framework for regression testing. A bash script,
+`opttracetest` will process the traces stored in the trace_examples
+subdirectory and compare the output with pre-recorded results.
+
+Usage:
+```
+optrace [-r] [tracefile ...]
+```
+
+`-r` records the current results
+
+If `-r` is not specified, and there is no existing result file, the current
+result will be printed to stdout.
+
+If no tracefile is specified, all files in the trace_examples directory will
+be processed.
+
+If the environment variable `MYSQL_SOURCE` is set to an existing MySQL
+source tree, all traces of the MySQL opt_trace test suite will also be
+processed.

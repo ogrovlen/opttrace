@@ -1,0 +1,1094 @@
+{
+  "steps": [
+    {
+      "join_preparation": {
+        "select#": 1,
+        "steps": [
+          {
+            "join_preparation": {
+              "select#": 3,
+              "steps": [
+                {
+                  "expanded_query": "/* select#3 */ select `lineitem`.`l_suppkey` AS `l_suppkey`,sum((`lineitem`.`l_extendedprice` * (1 - `lineitem`.`l_discount`))) AS `sum(l_extendedprice * (1 - l_discount))` from `lineitem` where ((`lineitem`.`l_shipDATE` >= '1996-07-01') and (`lineitem`.`l_shipDATE` < ('1996-07-01' + interval '90' day))) group by `lineitem`.`l_suppkey`"
+                }
+              ]
+            }
+          },
+          {
+            "view": {
+              "table": "`revenue0`",
+              "select#": 3,
+              "materialized": true
+            }
+          },
+          {
+            "join_preparation": {
+              "select#": 2,
+              "steps": [
+                {
+                  "join_preparation": {
+                    "select#": 4,
+                    "steps": [
+                      {
+                        "expanded_query": "/* select#4 */ select `lineitem`.`l_suppkey` AS `l_suppkey`,sum((`lineitem`.`l_extendedprice` * (1 - `lineitem`.`l_discount`))) AS `sum(l_extendedprice * (1 - l_discount))` from `lineitem` where ((`lineitem`.`l_shipDATE` >= '1996-07-01') and (`lineitem`.`l_shipDATE` < ('1996-07-01' + interval '90' day))) group by `lineitem`.`l_suppkey`"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "view": {
+                    "table": "`revenue0`",
+                    "select#": 4,
+                    "materialized": true
+                  }
+                },
+                {
+                  "expanded_query": "/* select#2 */ select max(`revenue0`.`total_revenue`) from `revenue0`"
+                }
+              ]
+            }
+          },
+          {
+            "expanded_query": "/* select#1 */ select `supplier`.`s_suppkey` AS `s_suppkey`,`supplier`.`s_name` AS `s_name`,`supplier`.`s_address` AS `s_address`,`supplier`.`s_phone` AS `s_phone`,`revenue0`.`total_revenue` AS `total_revenue` from `supplier` join `revenue0` where ((`supplier`.`s_suppkey` = `revenue0`.`supplier_no`) and (`revenue0`.`total_revenue` = (/* select#2 */ select max(`revenue0`.`total_revenue`) from `revenue0`))) order by `supplier`.`s_suppkey`"
+          }
+        ]
+      }
+    },
+    {
+      "join_optimization": {
+        "select#": 1,
+        "steps": [
+          {
+            "join_optimization": {
+              "select#": 3,
+              "steps": [
+                {
+                  "condition_processing": {
+                    "condition": "WHERE",
+                    "original_condition": "((`lineitem`.`l_shipDATE` >= '1996-07-01') and (`lineitem`.`l_shipDATE` < ('1996-07-01' + interval '90' day)))",
+                    "steps": [
+                      {
+                        "transformation": "equality_propagation",
+                        "resulting_condition": "((`lineitem`.`l_shipDATE` >= '1996-07-01') and (`lineitem`.`l_shipDATE` < ('1996-07-01' + interval '90' day)))"
+                      },
+                      {
+                        "transformation": "constant_propagation",
+                        "resulting_condition": "((`lineitem`.`l_shipDATE` >= '1996-07-01') and (`lineitem`.`l_shipDATE` < ('1996-07-01' + interval '90' day)))"
+                      },
+                      {
+                        "transformation": "trivial_condition_removal",
+                        "resulting_condition": "((`lineitem`.`l_shipDATE` >= '1996-07-01') and (`lineitem`.`l_shipDATE` < ('1996-07-01' + interval '90' day)))"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "substitute_generated_columns": {
+                  }
+                },
+                {
+                  "table_dependencies": [
+                    {
+                      "table": "`lineitem`",
+                      "row_may_be_null": false,
+                      "map_bit": 0,
+                      "depends_on_map_bits": [
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "ref_optimizer_key_uses": [
+                  ]
+                },
+                {
+                  "rows_estimation": [
+                    {
+                      "table": "`lineitem`",
+                      "const_keys_added": {
+                        "keys": [
+                          "i_l_partkey_suppkey",
+                          "i_l_suppkey"
+                        ],
+                        "cause": "group_by"
+                      },
+                      "range_analysis": {
+                        "table_scan": {
+                          "rows": 6001215,
+                          "cost": 613024
+                        },
+                        "potential_range_indexes": [
+                          {
+                            "index": "PRIMARY",
+                            "usable": false,
+                            "cause": "not_applicable"
+                          },
+                          {
+                            "index": "i_l_shipdate",
+                            "usable": true,
+                            "key_parts": [
+                              "l_shipDATE",
+                              "l_orderkey",
+                              "l_linenumber"
+                            ]
+                          },
+                          {
+                            "index": "i_l_partkey_suppkey",
+                            "usable": true,
+                            "key_parts": [
+                              "l_partkey",
+                              "l_suppkey",
+                              "l_orderkey",
+                              "l_linenumber"
+                            ]
+                          },
+                          {
+                            "index": "i_l_partkey",
+                            "usable": false,
+                            "cause": "not_applicable"
+                          },
+                          {
+                            "index": "i_l_suppkey",
+                            "usable": true,
+                            "key_parts": [
+                              "l_suppkey",
+                              "l_orderkey",
+                              "l_linenumber"
+                            ]
+                          },
+                          {
+                            "index": "i_l_receiptdate",
+                            "usable": false,
+                            "cause": "not_applicable"
+                          },
+                          {
+                            "index": "i_l_orderkey",
+                            "usable": false,
+                            "cause": "not_applicable"
+                          },
+                          {
+                            "index": "i_l_orderkey_quantity",
+                            "usable": false,
+                            "cause": "not_applicable"
+                          },
+                          {
+                            "index": "i_l_commitdate",
+                            "usable": false,
+                            "cause": "not_applicable"
+                          }
+                        ],
+                        "setup_range_conditions": [
+                        ],
+                        "group_index_range": {
+                          "chosen": false,
+                          "cause": "not_applicable_aggregate_function"
+                        },
+                        "skip_scan_range": {
+                          "chosen": false,
+                          "cause": "has_group_by"
+                        },
+                        "analyzing_range_alternatives": {
+                          "range_scan_alternatives": [
+                            {
+                              "index": "i_l_shipdate",
+                              "ranges": [
+                                "0xe1980f <= l_shipDATE < 0x3d990f"
+                              ],
+                              "index_dives_for_eq_ranges": true,
+                              "rowid_ordered": false,
+                              "using_mrr": false,
+                              "index_only": false,
+                              "rows": 444500,
+                              "cost": 155614,
+                              "chosen": true
+                            }
+                          ],
+                          "analyzing_roworder_intersect": {
+                            "usable": false,
+                            "cause": "too_few_roworder_scans"
+                          }
+                        },
+                        "chosen_range_access_summary": {
+                          "range_access_plan": {
+                            "type": "range_scan",
+                            "index": "i_l_shipdate",
+                            "rows": 444500,
+                            "ranges": [
+                              "0xe1980f <= l_shipDATE < 0x3d990f"
+                            ]
+                          },
+                          "rows_for_plan": 444500,
+                          "cost_for_plan": 155614,
+                          "chosen": true
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "considered_execution_plans": [
+                    {
+                      "plan_prefix": [
+                      ],
+                      "table": "`lineitem`",
+                      "best_access_path": {
+                        "considered_access_paths": [
+                          {
+                            "rows_to_scan": 444500,
+                            "filtering_effect": [
+                            ],
+                            "final_filtering_effect": 1,
+                            "access_type": "range",
+                            "range_details": {
+                              "used_index": "i_l_shipdate"
+                            },
+                            "resulting_rows": 444500,
+                            "cost": 200064,
+                            "chosen": true,
+                            "use_tmp_table": true
+                          }
+                        ]
+                      },
+                      "condition_filtering_pct": 100,
+                      "rows_for_plan": 444500,
+                      "cost_for_plan": 200064,
+                      "sort_cost": 444500,
+                      "new_cost_for_plan": 644564,
+                      "chosen": true
+                    }
+                  ]
+                },
+                {
+                  "attaching_conditions_to_tables": {
+                    "original_condition": "((`lineitem`.`l_shipDATE` >= '1996-07-01') and (`lineitem`.`l_shipDATE` < ('1996-07-01' + interval '90' day)))",
+                    "attached_conditions_computation": [
+                    ],
+                    "attached_conditions_summary": [
+                      {
+                        "table": "`lineitem`",
+                        "attached": "((`lineitem`.`l_shipDATE` >= '1996-07-01') and (`lineitem`.`l_shipDATE` < ('1996-07-01' + interval '90' day)))"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "optimizing_distinct_group_by_order_by": {
+                    "simplifying_group_by": {
+                      "original_clause": "`lineitem`.`l_suppkey`",
+                      "items": [
+                        {
+                          "item": "`lineitem`.`l_suppkey`"
+                        }
+                      ],
+                      "resulting_clause_is_simple": true,
+                      "resulting_clause": "`lineitem`.`l_suppkey`"
+                    }
+                  }
+                },
+                {
+                  "reconsidering_access_paths_for_index_ordering": {
+                    "clause": "GROUP BY",
+                    "index_order_summary": {
+                      "table": "`lineitem`",
+                      "index_provides_order": false,
+                      "order_direction": "undefined",
+                      "index": "i_l_shipdate",
+                      "plan_changed": false
+                    }
+                  }
+                },
+                {
+                  "refine_plan": [
+                    {
+                      "table": "`lineitem`",
+                      "pushed_index_condition": "((`lineitem`.`l_shipDATE` >= '1996-07-01') and (`lineitem`.`l_shipDATE` < <cache>(('1996-07-01' + interval '90' day))))",
+                      "table_condition_attached": null
+                    }
+                  ]
+                },
+                {
+                  "considering_tmp_tables": [
+                    {
+                      "adding_tmp_table_in_plan_at_position": 1,
+                      "write_method": "continuously_update_group_row"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "condition_processing": {
+              "condition": "WHERE",
+              "original_condition": "((`supplier`.`s_suppkey` = `revenue0`.`supplier_no`) and (`revenue0`.`total_revenue` = (/* select#2 */ select max(`revenue0`.`total_revenue`) from `revenue0`)))",
+              "steps": [
+                {
+                  "transformation": "equality_propagation",
+                  "subselect_evaluation": [
+                  ],
+                  "resulting_condition": "(multiple equal(`supplier`.`s_suppkey`, `revenue0`.`supplier_no`) and multiple equal((/* select#2 */ select max(`revenue0`.`total_revenue`) from `revenue0`), `revenue0`.`total_revenue`))"
+                },
+                {
+                  "transformation": "constant_propagation",
+                  "resulting_condition": "(multiple equal(`supplier`.`s_suppkey`, `revenue0`.`supplier_no`) and multiple equal((/* select#2 */ select max(`revenue0`.`total_revenue`) from `revenue0`), `revenue0`.`total_revenue`))"
+                },
+                {
+                  "transformation": "trivial_condition_removal",
+                  "resulting_condition": "(multiple equal(`supplier`.`s_suppkey`, `revenue0`.`supplier_no`) and multiple equal((/* select#2 */ select max(`revenue0`.`total_revenue`) from `revenue0`), `revenue0`.`total_revenue`))"
+                }
+              ]
+            }
+          },
+          {
+            "substitute_generated_columns": {
+            }
+          },
+          {
+            "table_dependencies": [
+              {
+                "table": "`supplier`",
+                "row_may_be_null": false,
+                "map_bit": 0,
+                "depends_on_map_bits": [
+                ]
+              },
+              {
+                "table": "`revenue0`",
+                "row_may_be_null": false,
+                "map_bit": 1,
+                "depends_on_map_bits": [
+                ]
+              }
+            ]
+          },
+          {
+            "ref_optimizer_key_uses": [
+              {
+                "table": "`supplier`",
+                "field": "s_suppkey",
+                "equals": "`revenue0`.`supplier_no`",
+                "null_rejecting": true
+              },
+              {
+                "table": "`revenue0`",
+                "field": "supplier_no",
+                "equals": "`supplier`.`s_suppkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`revenue0`",
+                "field": "total_revenue",
+                "equals": "(/* select#2 */ select max(`revenue0`.`total_revenue`) from `revenue0`)",
+                "null_rejecting": false
+              },
+              {
+                "table": "`revenue0`",
+                "field": "supplier_no",
+                "equals": "`supplier`.`s_suppkey`",
+                "null_rejecting": false
+              }
+            ]
+          },
+          {
+            "rows_estimation": [
+              {
+                "table": "`supplier`",
+                "table_scan": {
+                  "rows": 10000,
+                  "cost": 40.25
+                }
+              },
+              {
+                "table": "`revenue0`",
+                "table_scan": {
+                  "rows": 444500,
+                  "cost": 5558.8
+                }
+              }
+            ]
+          },
+          {
+            "considered_execution_plans": [
+              {
+                "plan_prefix": [
+                ],
+                "table": "`supplier`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "access_type": "ref",
+                      "index": "PRIMARY",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "rows_to_scan": 10000,
+                      "filtering_effect": [
+                      ],
+                      "final_filtering_effect": 1,
+                      "access_type": "scan",
+                      "resulting_rows": 10000,
+                      "cost": 1040.2,
+                      "chosen": true,
+                      "use_tmp_table": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 10000,
+                "cost_for_plan": 1040.2,
+                "rest_of_plan": [
+                  {
+                    "plan_prefix": [
+                      "`supplier`"
+                    ],
+                    "table": "`revenue0`",
+                    "best_access_path": {
+                      "considered_access_paths": [
+                        {
+                          "access_type": "ref",
+                          "index": "<auto_key0>",
+                          "rows": 44.45,
+                          "cost": 155575,
+                          "chosen": true
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "<auto_key1>",
+                          "rows": 80.352,
+                          "cost": 281232,
+                          "chosen": false
+                        },
+                        {
+                          "rows_to_scan": 444500,
+                          "filtering_effect": [
+                          ],
+                          "final_filtering_effect": 0.1,
+                          "access_type": "scan",
+                          "using_join_cache": true,
+                          "buffers_needed": 1,
+                          "resulting_rows": 44450,
+                          "cost": 4.45e7,
+                          "chosen": false
+                        }
+                      ]
+                    },
+                    "condition_filtering_pct": 100,
+                    "rows_for_plan": 444500,
+                    "cost_for_plan": 156615,
+                    "sort_cost": 444500,
+                    "new_cost_for_plan": 601115,
+                    "chosen": true
+                  }
+                ]
+              },
+              {
+                "plan_prefix": [
+                ],
+                "table": "`revenue0`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "access_type": "ref",
+                      "index": "<auto_key0>",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "access_type": "ref",
+                      "index": "<auto_key1>",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "rows_to_scan": 444500,
+                      "filtering_effect": [
+                      ],
+                      "final_filtering_effect": 0.1,
+                      "access_type": "scan",
+                      "resulting_rows": 44450,
+                      "cost": 50009,
+                      "chosen": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 44450,
+                "cost_for_plan": 50009,
+                "rest_of_plan": [
+                  {
+                    "plan_prefix": [
+                      "`revenue0`"
+                    ],
+                    "table": "`supplier`",
+                    "best_access_path": {
+                      "considered_access_paths": [
+                        {
+                          "access_type": "eq_ref",
+                          "index": "PRIMARY",
+                          "rows": 1,
+                          "cost": 15558,
+                          "chosen": true,
+                          "cause": "clustered_pk_chosen_by_heuristics"
+                        },
+                        {
+                          "rows_to_scan": 10000,
+                          "filtering_effect": [
+                          ],
+                          "final_filtering_effect": 1,
+                          "access_type": "scan",
+                          "using_join_cache": true,
+                          "buffers_needed": 1,
+                          "resulting_rows": 10000,
+                          "cost": 4.45e7,
+                          "chosen": false
+                        }
+                      ]
+                    },
+                    "condition_filtering_pct": 100,
+                    "rows_for_plan": 44450,
+                    "cost_for_plan": 65566,
+                    "sort_cost": 44450,
+                    "new_cost_for_plan": 110016,
+                    "chosen": true
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "attaching_conditions_to_tables": {
+              "original_condition": "((`revenue0`.`total_revenue` = (/* select#2 */ select max(`revenue0`.`total_revenue`) from `revenue0`)) and (`supplier`.`s_suppkey` = `revenue0`.`supplier_no`))",
+              "attached_conditions_computation": [
+              ],
+              "attached_conditions_summary": [
+                {
+                  "table": "`revenue0`",
+                  "attached": "((`revenue0`.`total_revenue` = (/* select#2 */ select max(`revenue0`.`total_revenue`) from `revenue0`)) and (`revenue0`.`supplier_no` is not null))"
+                },
+                {
+                  "table": "`supplier`",
+                  "attached": null
+                }
+              ]
+            }
+          },
+          {
+            "optimizing_distinct_group_by_order_by": {
+              "simplifying_order_by": {
+                "original_clause": "`supplier`.`s_suppkey`",
+                "items": [
+                  {
+                    "item": "`supplier`.`s_suppkey`"
+                  }
+                ],
+                "resulting_clause_is_simple": false,
+                "resulting_clause": "`supplier`.`s_suppkey`"
+              }
+            }
+          },
+          {
+            "refine_plan": [
+              {
+                "table": "`revenue0`"
+              },
+              {
+                "table": "`supplier`"
+              }
+            ]
+          },
+          {
+            "considering_tmp_tables": [
+              {
+                "adding_tmp_table_in_plan_at_position": 2,
+                "write_method": "write_all_rows"
+              },
+              {
+                "adding_sort_to_table_in_plan_at_position": 2
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "join_optimization": {
+        "select#": 2,
+        "steps": [
+          {
+            "join_optimization": {
+              "select#": 4,
+              "steps": [
+                {
+                  "condition_processing": {
+                    "condition": "WHERE",
+                    "original_condition": "((`lineitem`.`l_shipDATE` >= '1996-07-01') and (`lineitem`.`l_shipDATE` < ('1996-07-01' + interval '90' day)))",
+                    "steps": [
+                      {
+                        "transformation": "equality_propagation",
+                        "resulting_condition": "((`lineitem`.`l_shipDATE` >= '1996-07-01') and (`lineitem`.`l_shipDATE` < ('1996-07-01' + interval '90' day)))"
+                      },
+                      {
+                        "transformation": "constant_propagation",
+                        "resulting_condition": "((`lineitem`.`l_shipDATE` >= '1996-07-01') and (`lineitem`.`l_shipDATE` < ('1996-07-01' + interval '90' day)))"
+                      },
+                      {
+                        "transformation": "trivial_condition_removal",
+                        "resulting_condition": "((`lineitem`.`l_shipDATE` >= '1996-07-01') and (`lineitem`.`l_shipDATE` < ('1996-07-01' + interval '90' day)))"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "substitute_generated_columns": {
+                  }
+                },
+                {
+                  "table_dependencies": [
+                    {
+                      "table": "`lineitem`",
+                      "row_may_be_null": false,
+                      "map_bit": 0,
+                      "depends_on_map_bits": [
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "ref_optimizer_key_uses": [
+                  ]
+                },
+                {
+                  "rows_estimation": [
+                    {
+                      "table": "`lineitem`",
+                      "const_keys_added": {
+                        "keys": [
+                          "i_l_partkey_suppkey",
+                          "i_l_suppkey"
+                        ],
+                        "cause": "group_by"
+                      },
+                      "range_analysis": {
+                        "table_scan": {
+                          "rows": 6001215,
+                          "cost": 613024
+                        },
+                        "potential_range_indexes": [
+                          {
+                            "index": "PRIMARY",
+                            "usable": false,
+                            "cause": "not_applicable"
+                          },
+                          {
+                            "index": "i_l_shipdate",
+                            "usable": true,
+                            "key_parts": [
+                              "l_shipDATE",
+                              "l_orderkey",
+                              "l_linenumber"
+                            ]
+                          },
+                          {
+                            "index": "i_l_partkey_suppkey",
+                            "usable": true,
+                            "key_parts": [
+                              "l_partkey",
+                              "l_suppkey",
+                              "l_orderkey",
+                              "l_linenumber"
+                            ]
+                          },
+                          {
+                            "index": "i_l_partkey",
+                            "usable": false,
+                            "cause": "not_applicable"
+                          },
+                          {
+                            "index": "i_l_suppkey",
+                            "usable": true,
+                            "key_parts": [
+                              "l_suppkey",
+                              "l_orderkey",
+                              "l_linenumber"
+                            ]
+                          },
+                          {
+                            "index": "i_l_receiptdate",
+                            "usable": false,
+                            "cause": "not_applicable"
+                          },
+                          {
+                            "index": "i_l_orderkey",
+                            "usable": false,
+                            "cause": "not_applicable"
+                          },
+                          {
+                            "index": "i_l_orderkey_quantity",
+                            "usable": false,
+                            "cause": "not_applicable"
+                          },
+                          {
+                            "index": "i_l_commitdate",
+                            "usable": false,
+                            "cause": "not_applicable"
+                          }
+                        ],
+                        "setup_range_conditions": [
+                        ],
+                        "group_index_range": {
+                          "chosen": false,
+                          "cause": "not_applicable_aggregate_function"
+                        },
+                        "skip_scan_range": {
+                          "chosen": false,
+                          "cause": "has_group_by"
+                        },
+                        "analyzing_range_alternatives": {
+                          "range_scan_alternatives": [
+                            {
+                              "index": "i_l_shipdate",
+                              "ranges": [
+                                "0xe1980f <= l_shipDATE < 0x3d990f"
+                              ],
+                              "index_dives_for_eq_ranges": true,
+                              "rowid_ordered": false,
+                              "using_mrr": false,
+                              "index_only": false,
+                              "rows": 444500,
+                              "cost": 155614,
+                              "chosen": true
+                            }
+                          ],
+                          "analyzing_roworder_intersect": {
+                            "usable": false,
+                            "cause": "too_few_roworder_scans"
+                          }
+                        },
+                        "chosen_range_access_summary": {
+                          "range_access_plan": {
+                            "type": "range_scan",
+                            "index": "i_l_shipdate",
+                            "rows": 444500,
+                            "ranges": [
+                              "0xe1980f <= l_shipDATE < 0x3d990f"
+                            ]
+                          },
+                          "rows_for_plan": 444500,
+                          "cost_for_plan": 155614,
+                          "chosen": true
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "considered_execution_plans": [
+                    {
+                      "plan_prefix": [
+                      ],
+                      "table": "`lineitem`",
+                      "best_access_path": {
+                        "considered_access_paths": [
+                          {
+                            "rows_to_scan": 444500,
+                            "filtering_effect": [
+                            ],
+                            "final_filtering_effect": 1,
+                            "access_type": "range",
+                            "range_details": {
+                              "used_index": "i_l_shipdate"
+                            },
+                            "resulting_rows": 444500,
+                            "cost": 200064,
+                            "chosen": true,
+                            "use_tmp_table": true
+                          }
+                        ]
+                      },
+                      "condition_filtering_pct": 100,
+                      "rows_for_plan": 444500,
+                      "cost_for_plan": 200064,
+                      "sort_cost": 444500,
+                      "new_cost_for_plan": 644564,
+                      "chosen": true
+                    }
+                  ]
+                },
+                {
+                  "attaching_conditions_to_tables": {
+                    "original_condition": "((`lineitem`.`l_shipDATE` >= '1996-07-01') and (`lineitem`.`l_shipDATE` < ('1996-07-01' + interval '90' day)))",
+                    "attached_conditions_computation": [
+                    ],
+                    "attached_conditions_summary": [
+                      {
+                        "table": "`lineitem`",
+                        "attached": "((`lineitem`.`l_shipDATE` >= '1996-07-01') and (`lineitem`.`l_shipDATE` < ('1996-07-01' + interval '90' day)))"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "optimizing_distinct_group_by_order_by": {
+                    "simplifying_group_by": {
+                      "original_clause": "`lineitem`.`l_suppkey`",
+                      "items": [
+                        {
+                          "item": "`lineitem`.`l_suppkey`"
+                        }
+                      ],
+                      "resulting_clause_is_simple": true,
+                      "resulting_clause": "`lineitem`.`l_suppkey`"
+                    }
+                  }
+                },
+                {
+                  "reconsidering_access_paths_for_index_ordering": {
+                    "clause": "GROUP BY",
+                    "index_order_summary": {
+                      "table": "`lineitem`",
+                      "index_provides_order": false,
+                      "order_direction": "undefined",
+                      "index": "i_l_shipdate",
+                      "plan_changed": false
+                    }
+                  }
+                },
+                {
+                  "refine_plan": [
+                    {
+                      "table": "`lineitem`",
+                      "pushed_index_condition": "((`lineitem`.`l_shipDATE` >= '1996-07-01') and (`lineitem`.`l_shipDATE` < <cache>(('1996-07-01' + interval '90' day))))",
+                      "table_condition_attached": null
+                    }
+                  ]
+                },
+                {
+                  "considering_tmp_tables": [
+                    {
+                      "adding_tmp_table_in_plan_at_position": 1,
+                      "write_method": "continuously_update_group_row"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "table_dependencies": [
+              {
+                "table": "`revenue0`",
+                "row_may_be_null": false,
+                "map_bit": 0,
+                "depends_on_map_bits": [
+                ]
+              }
+            ]
+          },
+          {
+            "rows_estimation": [
+              {
+                "table": "`revenue0`",
+                "table_scan": {
+                  "rows": 444500,
+                  "cost": 5558.8
+                }
+              }
+            ]
+          },
+          {
+            "considered_execution_plans": [
+              {
+                "plan_prefix": [
+                ],
+                "table": "`revenue0`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "rows_to_scan": 444500,
+                      "access_type": "scan",
+                      "resulting_rows": 444500,
+                      "cost": 50009,
+                      "chosen": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 444500,
+                "cost_for_plan": 50009,
+                "chosen": true
+              }
+            ]
+          },
+          {
+            "attaching_conditions_to_tables": {
+              "original_condition": null,
+              "attached_conditions_computation": [
+              ],
+              "attached_conditions_summary": [
+                {
+                  "table": "`revenue0`",
+                  "attached": null
+                }
+              ]
+            }
+          },
+          {
+            "optimizing_distinct_group_by_order_by": {
+            }
+          },
+          {
+            "refine_plan": [
+              {
+                "table": "`revenue0`"
+              }
+            ]
+          },
+          {
+            "considering_tmp_tables": [
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "join_execution": {
+        "select#": 1,
+        "steps": [
+          {
+            "creating_tmp_table": {
+              "tmp_table_info": {
+                "table": "`revenue0`",
+                "in_plan_at_position": 0,
+                "columns": 2,
+                "row_length": 25,
+                "key_length": 0,
+                "unique_constraint": false,
+                "makes_grouped_rows": false,
+                "cannot_insert_duplicates": false,
+                "location": "TempTable"
+              }
+            }
+          },
+          {
+            "join_execution": {
+              "select#": 3,
+              "steps": [
+                {
+                  "creating_tmp_table": {
+                    "tmp_table_info": {
+                      "table": "intermediate_tmp_table",
+                      "in_plan_at_position": 1,
+                      "columns": 2,
+                      "row_length": 26,
+                      "key_length": 5,
+                      "unique_constraint": false,
+                      "makes_grouped_rows": true,
+                      "cannot_insert_duplicates": false,
+                      "location": "TempTable"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "subselect_execution": {
+              "select#": 2,
+              "steps": [
+                {
+                  "join_execution": {
+                    "select#": 2,
+                    "steps": [
+                      {
+                        "creating_tmp_table": {
+                          "tmp_table_info": {
+                            "table": "`revenue0`",
+                            "in_plan_at_position": 0,
+                            "columns": 2,
+                            "row_length": 25,
+                            "key_length": 0,
+                            "unique_constraint": false,
+                            "makes_grouped_rows": false,
+                            "cannot_insert_duplicates": false,
+                            "location": "TempTable"
+                          }
+                        }
+                      },
+                      {
+                        "join_execution": {
+                          "select#": 4,
+                          "steps": [
+                            {
+                              "creating_tmp_table": {
+                                "tmp_table_info": {
+                                  "table": "intermediate_tmp_table",
+                                  "in_plan_at_position": 1,
+                                  "columns": 2,
+                                  "row_length": 26,
+                                  "key_length": 5,
+                                  "unique_constraint": false,
+                                  "makes_grouped_rows": true,
+                                  "cannot_insert_duplicates": false,
+                                  "location": "TempTable"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "creating_tmp_table": {
+              "tmp_table_info": {
+                "table": "intermediate_tmp_table",
+                "in_plan_at_position": 2,
+                "columns": 5,
+                "row_length": 106,
+                "key_length": 0,
+                "unique_constraint": false,
+                "makes_grouped_rows": false,
+                "cannot_insert_duplicates": false,
+                "location": "TempTable"
+              }
+            }
+          },
+          {
+            "sorting_table_in_plan_at_position": 2,
+            "filesort_information": [
+              {
+                "direction": "asc",
+                "table": "intermediate_tmp_table",
+                "field": "s_suppkey"
+              }
+            ],
+            "filesort_priority_queue_optimization": {
+              "usable": false,
+              "cause": "not applicable (no LIMIT)"
+            },
+            "filesort_execution": [
+            ],
+            "filesort_summary": {
+              "memory_available": 262144,
+              "key_size": 12,
+              "row_size": 12,
+              "max_rows_per_buffer": 15,
+              "num_rows_estimate": 15,
+              "num_rows_found": 1,
+              "num_initial_chunks_spilled_to_disk": 0,
+              "peak_memory_used": 32776,
+              "sort_algorithm": "none",
+              "unpacked_addon_fields": "using_heap_table",
+              "sort_mode": "<fixed_sort_key, rowid>"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

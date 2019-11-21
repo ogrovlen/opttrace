@@ -1,0 +1,738 @@
+{
+  "steps": [
+    {
+      "join_preparation": {
+        "select#": 1,
+        "steps": [
+          {
+            "expanded_query": "/* select#1 */ select `lineitem`.`l_orderkey` AS `l_orderkey`,sum((`lineitem`.`l_extendedprice` * (1 - `lineitem`.`l_discount`))) AS `revenue`,`orders`.`o_orderDATE` AS `o_orderdate`,`orders`.`o_shippriority` AS `o_shippriority` from `customer` join `orders` join `lineitem` where ((`customer`.`c_mktsegment` = 'AUTOMOBILE') and (`customer`.`c_custkey` = `orders`.`o_custkey`) and (`lineitem`.`l_orderkey` = `orders`.`o_orderkey`) and (`orders`.`o_orderDATE` < '1995-03-07') and (`lineitem`.`l_shipDATE` > '1995-03-07')) group by `lineitem`.`l_orderkey`,`orders`.`o_orderDATE`,`orders`.`o_shippriority` order by `revenue` desc,`orders`.`o_orderDATE` limit 10"
+          }
+        ]
+      }
+    },
+    {
+      "join_optimization": {
+        "select#": 1,
+        "steps": [
+          {
+            "condition_processing": {
+              "condition": "WHERE",
+              "original_condition": "((`customer`.`c_mktsegment` = 'AUTOMOBILE') and (`customer`.`c_custkey` = `orders`.`o_custkey`) and (`lineitem`.`l_orderkey` = `orders`.`o_orderkey`) and (`orders`.`o_orderDATE` < '1995-03-07') and (`lineitem`.`l_shipDATE` > '1995-03-07'))",
+              "steps": [
+                {
+                  "transformation": "equality_propagation",
+                  "resulting_condition": "((`orders`.`o_orderDATE` < '1995-03-07') and (`lineitem`.`l_shipDATE` > '1995-03-07') and multiple equal('AUTOMOBILE', `customer`.`c_mktsegment`) and multiple equal(`customer`.`c_custkey`, `orders`.`o_custkey`) and multiple equal(`lineitem`.`l_orderkey`, `orders`.`o_orderkey`))"
+                },
+                {
+                  "transformation": "constant_propagation",
+                  "resulting_condition": "((`orders`.`o_orderDATE` < '1995-03-07') and (`lineitem`.`l_shipDATE` > '1995-03-07') and multiple equal('AUTOMOBILE', `customer`.`c_mktsegment`) and multiple equal(`customer`.`c_custkey`, `orders`.`o_custkey`) and multiple equal(`lineitem`.`l_orderkey`, `orders`.`o_orderkey`))"
+                },
+                {
+                  "transformation": "trivial_condition_removal",
+                  "resulting_condition": "((`orders`.`o_orderDATE` < '1995-03-07') and (`lineitem`.`l_shipDATE` > '1995-03-07') and multiple equal('AUTOMOBILE', `customer`.`c_mktsegment`) and multiple equal(`customer`.`c_custkey`, `orders`.`o_custkey`) and multiple equal(`lineitem`.`l_orderkey`, `orders`.`o_orderkey`))"
+                }
+              ]
+            }
+          },
+          {
+            "substitute_generated_columns": {
+            }
+          },
+          {
+            "table_dependencies": [
+              {
+                "table": "`customer`",
+                "row_may_be_null": false,
+                "map_bit": 0,
+                "depends_on_map_bits": [
+                ]
+              },
+              {
+                "table": "`orders`",
+                "row_may_be_null": false,
+                "map_bit": 1,
+                "depends_on_map_bits": [
+                ]
+              },
+              {
+                "table": "`lineitem`",
+                "row_may_be_null": false,
+                "map_bit": 2,
+                "depends_on_map_bits": [
+                ]
+              }
+            ]
+          },
+          {
+            "ref_optimizer_key_uses": [
+              {
+                "table": "`customer`",
+                "field": "c_custkey",
+                "equals": "`orders`.`o_custkey`",
+                "null_rejecting": true
+              },
+              {
+                "table": "`orders`",
+                "field": "o_orderkey",
+                "equals": "`lineitem`.`l_orderkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`orders`",
+                "field": "o_custkey",
+                "equals": "`customer`.`c_custkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`orders`",
+                "field": "o_orderkey",
+                "equals": "`lineitem`.`l_orderkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`lineitem`",
+                "field": "l_orderkey",
+                "equals": "`orders`.`o_orderkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`lineitem`",
+                "field": "l_orderkey",
+                "equals": "`orders`.`o_orderkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`lineitem`",
+                "field": "l_orderkey",
+                "equals": "`orders`.`o_orderkey`",
+                "null_rejecting": false
+              }
+            ]
+          },
+          {
+            "rows_estimation": [
+              {
+                "table": "`customer`",
+                "table_scan": {
+                  "rows": 150000,
+                  "cost": 441
+                }
+              },
+              {
+                "table": "`orders`",
+                "range_analysis": {
+                  "table_scan": {
+                    "rows": 1500000,
+                    "cost": 152973
+                  },
+                  "potential_range_indexes": [
+                    {
+                      "index": "PRIMARY",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_o_orderdate",
+                      "usable": true,
+                      "key_parts": [
+                        "o_orderDATE",
+                        "o_orderkey"
+                      ]
+                    },
+                    {
+                      "index": "i_o_custkey",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    }
+                  ],
+                  "setup_range_conditions": [
+                  ],
+                  "group_index_range": {
+                    "chosen": false,
+                    "cause": "not_single_table"
+                  },
+                  "skip_scan_range": {
+                    "chosen": false,
+                    "cause": "not_single_table"
+                  },
+                  "analyzing_range_alternatives": {
+                    "range_scan_alternatives": [
+                      {
+                        "index": "i_o_orderdate",
+                        "ranges": [
+                          "NULL < o_orderDATE < 0x67960f"
+                        ],
+                        "index_dives_for_eq_ranges": true,
+                        "rowid_ordered": false,
+                        "using_mrr": false,
+                        "index_only": false,
+                        "rows": 750000,
+                        "cost": 262500,
+                        "chosen": false,
+                        "cause": "cost"
+                      }
+                    ],
+                    "analyzing_roworder_intersect": {
+                      "usable": false,
+                      "cause": "too_few_roworder_scans"
+                    }
+                  }
+                }
+              },
+              {
+                "table": "`lineitem`",
+                "range_analysis": {
+                  "table_scan": {
+                    "rows": 6001215,
+                    "cost": 613024
+                  },
+                  "potential_range_indexes": [
+                    {
+                      "index": "PRIMARY",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_l_shipdate",
+                      "usable": true,
+                      "key_parts": [
+                        "l_shipDATE",
+                        "l_orderkey",
+                        "l_linenumber"
+                      ]
+                    },
+                    {
+                      "index": "i_l_partkey_suppkey",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_l_partkey",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_l_suppkey",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_l_receiptdate",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_l_orderkey",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_l_orderkey_quantity",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_l_commitdate",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    }
+                  ],
+                  "setup_range_conditions": [
+                  ],
+                  "group_index_range": {
+                    "chosen": false,
+                    "cause": "not_single_table"
+                  },
+                  "skip_scan_range": {
+                    "chosen": false,
+                    "cause": "not_single_table"
+                  },
+                  "analyzing_range_alternatives": {
+                    "range_scan_alternatives": [
+                      {
+                        "index": "i_l_shipdate",
+                        "ranges": [
+                          "0x67960f < l_shipDATE"
+                        ],
+                        "index_dives_for_eq_ranges": true,
+                        "rowid_ordered": false,
+                        "using_mrr": false,
+                        "index_only": false,
+                        "rows": 3000607,
+                        "cost": 1.05e6,
+                        "chosen": false,
+                        "cause": "cost"
+                      }
+                    ],
+                    "analyzing_roworder_intersect": {
+                      "usable": false,
+                      "cause": "too_few_roworder_scans"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "considered_execution_plans": [
+              {
+                "plan_prefix": [
+                ],
+                "table": "`customer`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "access_type": "ref",
+                      "index": "PRIMARY",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "rows_to_scan": 150000,
+                      "filtering_effect": [
+                      ],
+                      "final_filtering_effect": 0.1,
+                      "access_type": "scan",
+                      "resulting_rows": 15000,
+                      "cost": 15441,
+                      "chosen": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 15000,
+                "cost_for_plan": 15441,
+                "rest_of_plan": [
+                  {
+                    "plan_prefix": [
+                      "`customer`"
+                    ],
+                    "table": "`orders`",
+                    "best_access_path": {
+                      "considered_access_paths": [
+                        {
+                          "access_type": "ref",
+                          "index": "PRIMARY",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "i_o_custkey",
+                          "rows": 15.001,
+                          "cost": 78753,
+                          "chosen": true
+                        },
+                        {
+                          "rows_to_scan": 1500000,
+                          "filtering_effect": [
+                          ],
+                          "final_filtering_effect": 0.5,
+                          "access_type": "scan",
+                          "using_join_cache": true,
+                          "buffers_needed": 1,
+                          "resulting_rows": 750000,
+                          "cost": 1.13e9,
+                          "chosen": false
+                        }
+                      ]
+                    },
+                    "condition_filtering_pct": 50,
+                    "rows_for_plan": 112505,
+                    "cost_for_plan": 94194,
+                    "rest_of_plan": [
+                      {
+                        "plan_prefix": [
+                          "`customer`",
+                          "`orders`"
+                        ],
+                        "table": "`lineitem`",
+                        "best_access_path": {
+                          "considered_access_paths": [
+                            {
+                              "access_type": "ref",
+                              "index": "PRIMARY",
+                              "rows": 4.0008,
+                              "cost": 73502,
+                              "chosen": true
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_l_orderkey",
+                              "rows": 4.0008,
+                              "cost": 157578,
+                              "chosen": false
+                            },
+                            {
+                              "access_type": "ref",
+                              "index": "i_l_orderkey_quantity",
+                              "rows": 4.0008,
+                              "cost": 157578,
+                              "chosen": false
+                            },
+                            {
+                              "rows_to_scan": 6001215,
+                              "filtering_effect": [
+                              ],
+                              "final_filtering_effect": 0.5,
+                              "access_type": "scan",
+                              "using_join_cache": true,
+                              "buffers_needed": 1,
+                              "resulting_rows": 3e6,
+                              "cost": 3.4e10,
+                              "chosen": false
+                            }
+                          ]
+                        },
+                        "condition_filtering_pct": 50,
+                        "rows_for_plan": 225055,
+                        "cost_for_plan": 167696,
+                        "chosen": true
+                      }
+                    ]
+                  },
+                  {
+                    "plan_prefix": [
+                      "`customer`"
+                    ],
+                    "table": "`lineitem`",
+                    "best_access_path": {
+                      "considered_access_paths": [
+                        {
+                          "access_type": "ref",
+                          "index": "PRIMARY",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "i_l_orderkey",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "i_l_orderkey_quantity",
+                          "usable": false,
+                          "chosen": false
+                        },
+                        {
+                          "rows_to_scan": 6001215,
+                          "filtering_effect": [
+                          ],
+                          "final_filtering_effect": 0.5,
+                          "access_type": "scan",
+                          "using_join_cache": true,
+                          "buffers_needed": 1,
+                          "resulting_rows": 3e6,
+                          "cost": 4.5e9,
+                          "chosen": true
+                        }
+                      ]
+                    },
+                    "condition_filtering_pct": 100,
+                    "rows_for_plan": 4.5e10,
+                    "cost_for_plan": 4.5e9,
+                    "pruned_by_cost": true
+                  }
+                ]
+              },
+              {
+                "plan_prefix": [
+                ],
+                "table": "`orders`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "access_type": "ref",
+                      "index": "PRIMARY",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "access_type": "ref",
+                      "index": "i_o_custkey",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "rows_to_scan": 1500000,
+                      "filtering_effect": [
+                      ],
+                      "final_filtering_effect": 0.5,
+                      "access_type": "scan",
+                      "resulting_rows": 750000,
+                      "cost": 152971,
+                      "chosen": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 750000,
+                "cost_for_plan": 152971,
+                "rest_of_plan": [
+                  {
+                    "plan_prefix": [
+                      "`orders`"
+                    ],
+                    "table": "`customer`",
+                    "best_access_path": {
+                      "considered_access_paths": [
+                        {
+                          "access_type": "eq_ref",
+                          "index": "PRIMARY",
+                          "rows": 1,
+                          "cost": 262500,
+                          "chosen": true,
+                          "cause": "clustered_pk_chosen_by_heuristics"
+                        },
+                        {
+                          "rows_to_scan": 150000,
+                          "filtering_effect": [
+                          ],
+                          "final_filtering_effect": 0.1,
+                          "access_type": "scan",
+                          "using_join_cache": true,
+                          "buffers_needed": 3,
+                          "resulting_rows": 15000,
+                          "cost": 1.13e9,
+                          "chosen": false
+                        }
+                      ]
+                    },
+                    "condition_filtering_pct": 10,
+                    "rows_for_plan": 75000,
+                    "cost_for_plan": 415471,
+                    "pruned_by_cost": true
+                  },
+                  {
+                    "plan_prefix": [
+                      "`orders`"
+                    ],
+                    "table": "`lineitem`",
+                    "best_access_path": {
+                      "considered_access_paths": [
+                        {
+                          "access_type": "ref",
+                          "index": "PRIMARY",
+                          "rows": 4.0008,
+                          "cost": 489991,
+                          "chosen": true
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "i_l_orderkey",
+                          "rows": 4.0008,
+                          "cost": 1.05e6,
+                          "chosen": false
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "i_l_orderkey_quantity",
+                          "rows": 4.0008,
+                          "cost": 1.05e6,
+                          "chosen": false
+                        },
+                        {
+                          "rows_to_scan": 6001215,
+                          "filtering_effect": [
+                          ],
+                          "final_filtering_effect": 0.5,
+                          "access_type": "scan",
+                          "using_join_cache": true,
+                          "buffers_needed": 3,
+                          "resulting_rows": 3e6,
+                          "cost": 2.3e11,
+                          "chosen": false
+                        }
+                      ]
+                    },
+                    "condition_filtering_pct": 50,
+                    "rows_for_plan": 1.5e6,
+                    "cost_for_plan": 642962,
+                    "pruned_by_cost": true
+                  }
+                ]
+              },
+              {
+                "plan_prefix": [
+                ],
+                "table": "`lineitem`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "access_type": "ref",
+                      "index": "PRIMARY",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "access_type": "ref",
+                      "index": "i_l_orderkey",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "access_type": "ref",
+                      "index": "i_l_orderkey_quantity",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "rows_to_scan": 6001215,
+                      "filtering_effect": [
+                      ],
+                      "final_filtering_effect": 0.5,
+                      "access_type": "scan",
+                      "resulting_rows": 3e6,
+                      "cost": 613022,
+                      "chosen": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 3e6,
+                "cost_for_plan": 613022,
+                "pruned_by_cost": true
+              }
+            ]
+          },
+          {
+            "attaching_conditions_to_tables": {
+              "original_condition": "((`lineitem`.`l_orderkey` = `orders`.`o_orderkey`) and (`orders`.`o_custkey` = `customer`.`c_custkey`) and (`customer`.`c_mktsegment` = 'AUTOMOBILE') and (`orders`.`o_orderDATE` < '1995-03-07') and (`lineitem`.`l_shipDATE` > '1995-03-07'))",
+              "attached_conditions_computation": [
+              ],
+              "attached_conditions_summary": [
+                {
+                  "table": "`customer`",
+                  "attached": "(`customer`.`c_mktsegment` = 'AUTOMOBILE')"
+                },
+                {
+                  "table": "`orders`",
+                  "attached": "(`orders`.`o_orderDATE` < '1995-03-07')"
+                },
+                {
+                  "table": "`lineitem`",
+                  "attached": "(`lineitem`.`l_shipDATE` > '1995-03-07')"
+                }
+              ]
+            }
+          },
+          {
+            "optimizing_distinct_group_by_order_by": {
+              "simplifying_order_by": {
+                "original_clause": "`revenue` desc,`orders`.`o_orderDATE`",
+                "items": [
+                  {
+                    "item": "sum((`lineitem`.`l_extendedprice` * (1 - `lineitem`.`l_discount`)))"
+                  },
+                  {
+                    "item": "`orders`.`o_orderDATE`"
+                  }
+                ],
+                "resulting_clause_is_simple": false,
+                "resulting_clause": "`revenue` desc,`orders`.`o_orderDATE`"
+              },
+              "simplifying_group_by": {
+                "original_clause": "`lineitem`.`l_orderkey`,`orders`.`o_orderDATE`,`orders`.`o_shippriority`",
+                "items": [
+                  {
+                    "item": "`lineitem`.`l_orderkey`"
+                  },
+                  {
+                    "item": "`orders`.`o_orderDATE`"
+                  },
+                  {
+                    "item": "`orders`.`o_shippriority`"
+                  }
+                ],
+                "resulting_clause_is_simple": false,
+                "resulting_clause": "`lineitem`.`l_orderkey`,`orders`.`o_orderDATE`,`orders`.`o_shippriority`"
+              }
+            }
+          },
+          {
+            "refine_plan": [
+              {
+                "table": "`customer`"
+              },
+              {
+                "table": "`orders`"
+              },
+              {
+                "table": "`lineitem`"
+              }
+            ]
+          },
+          {
+            "considering_tmp_tables": [
+              {
+                "adding_tmp_table_in_plan_at_position": 3,
+                "write_method": "continuously_update_group_row"
+              },
+              {
+                "adding_sort_to_table_in_plan_at_position": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "join_execution": {
+        "select#": 1,
+        "steps": [
+          {
+            "creating_tmp_table": {
+              "tmp_table_info": {
+                "table": "intermediate_tmp_table",
+                "in_plan_at_position": 3,
+                "columns": 4,
+                "row_length": 34,
+                "key_length": 13,
+                "unique_constraint": false,
+                "makes_grouped_rows": true,
+                "cannot_insert_duplicates": false,
+                "location": "TempTable"
+              }
+            }
+          },
+          {
+            "sorting_table_in_plan_at_position": 3,
+            "filesort_information": [
+              {
+                "direction": "desc",
+                "table": "intermediate_tmp_table",
+                "field": "revenue"
+              },
+              {
+                "direction": "asc",
+                "table": "intermediate_tmp_table",
+                "field": "o_orderDATE"
+              }
+            ],
+            "filesort_priority_queue_optimization": {
+              "limit": 10,
+              "chosen": true
+            },
+            "filesort_execution": [
+            ],
+            "filesort_summary": {
+              "memory_available": 262144,
+              "key_size": 33,
+              "row_size": 33,
+              "max_rows_per_buffer": 11,
+              "num_rows_estimate": 11499,
+              "num_rows_found": 11489,
+              "num_initial_chunks_spilled_to_disk": 0,
+              "peak_memory_used": 451,
+              "sort_algorithm": "std::sort",
+              "unpacked_addon_fields": "using_priority_queue",
+              "sort_mode": "<fixed_sort_key, rowid>"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

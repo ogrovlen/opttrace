@@ -1,0 +1,220 @@
+{
+  "steps": [
+    {
+      "join_preparation": {
+        "select#": 1,
+        "steps": [
+          {
+            "expanded_query": "/* select#1 */ select sum((`lineitem`.`l_extendedprice` * `lineitem`.`l_discount`)) AS `revenue` from `lineitem` where ((`lineitem`.`l_shipDATE` >= '1994-01-01') and (`lineitem`.`l_shipDATE` < ('1994-01-01' + interval '1' year)) and (`lineitem`.`l_discount` between (0.09 - 0.01) and (0.09 + 0.01)) and (`lineitem`.`l_quantity` < 24))"
+          }
+        ]
+      }
+    },
+    {
+      "join_optimization": {
+        "select#": 1,
+        "steps": [
+          {
+            "condition_processing": {
+              "condition": "WHERE",
+              "original_condition": "((`lineitem`.`l_shipDATE` >= '1994-01-01') and (`lineitem`.`l_shipDATE` < ('1994-01-01' + interval '1' year)) and (`lineitem`.`l_discount` between (0.09 - 0.01) and (0.09 + 0.01)) and (`lineitem`.`l_quantity` < 24))",
+              "steps": [
+                {
+                  "transformation": "equality_propagation",
+                  "resulting_condition": "((`lineitem`.`l_shipDATE` >= '1994-01-01') and (`lineitem`.`l_shipDATE` < ('1994-01-01' + interval '1' year)) and (`lineitem`.`l_discount` between (0.09 - 0.01) and (0.09 + 0.01)) and (`lineitem`.`l_quantity` < 24))"
+                },
+                {
+                  "transformation": "constant_propagation",
+                  "resulting_condition": "((`lineitem`.`l_shipDATE` >= '1994-01-01') and (`lineitem`.`l_shipDATE` < ('1994-01-01' + interval '1' year)) and (`lineitem`.`l_discount` between (0.09 - 0.01) and (0.09 + 0.01)) and (`lineitem`.`l_quantity` < 24))"
+                },
+                {
+                  "transformation": "trivial_condition_removal",
+                  "resulting_condition": "((`lineitem`.`l_shipDATE` >= '1994-01-01') and (`lineitem`.`l_shipDATE` < ('1994-01-01' + interval '1' year)) and (`lineitem`.`l_discount` between (0.09 - 0.01) and (0.09 + 0.01)) and (`lineitem`.`l_quantity` < 24))"
+                }
+              ]
+            }
+          },
+          {
+            "substitute_generated_columns": {
+            }
+          },
+          {
+            "table_dependencies": [
+              {
+                "table": "`lineitem`",
+                "row_may_be_null": false,
+                "map_bit": 0,
+                "depends_on_map_bits": [
+                ]
+              }
+            ]
+          },
+          {
+            "ref_optimizer_key_uses": [
+            ]
+          },
+          {
+            "rows_estimation": [
+              {
+                "table": "`lineitem`",
+                "range_analysis": {
+                  "table_scan": {
+                    "rows": 6001215,
+                    "cost": 613024
+                  },
+                  "potential_range_indexes": [
+                    {
+                      "index": "PRIMARY",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_l_shipdate",
+                      "usable": true,
+                      "key_parts": [
+                        "l_shipDATE",
+                        "l_orderkey",
+                        "l_linenumber"
+                      ]
+                    },
+                    {
+                      "index": "i_l_partkey_suppkey",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_l_partkey",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_l_suppkey",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_l_receiptdate",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_l_orderkey",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_l_orderkey_quantity",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    },
+                    {
+                      "index": "i_l_commitdate",
+                      "usable": false,
+                      "cause": "not_applicable"
+                    }
+                  ],
+                  "setup_range_conditions": [
+                  ],
+                  "group_index_range": {
+                    "chosen": false,
+                    "cause": "not_group_by_or_distinct"
+                  },
+                  "skip_scan_range": {
+                    "potential_skip_scan_indexes": [
+                      {
+                        "index": "i_l_shipdate",
+                        "usable": false,
+                        "cause": "query_references_nonkey_column"
+                      }
+                    ]
+                  },
+                  "analyzing_range_alternatives": {
+                    "range_scan_alternatives": [
+                      {
+                        "index": "i_l_shipdate",
+                        "ranges": [
+                          "0x21940f <= l_shipDATE < 0x21960f"
+                        ],
+                        "index_dives_for_eq_ranges": true,
+                        "rowid_ordered": false,
+                        "using_mrr": false,
+                        "index_only": false,
+                        "rows": 1819568,
+                        "cost": 637008,
+                        "chosen": false,
+                        "cause": "cost"
+                      }
+                    ],
+                    "analyzing_roworder_intersect": {
+                      "usable": false,
+                      "cause": "too_few_roworder_scans"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "considered_execution_plans": [
+              {
+                "plan_prefix": [
+                ],
+                "table": "`lineitem`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "rows_to_scan": 6001215,
+                      "access_type": "scan",
+                      "resulting_rows": 6e6,
+                      "cost": 613022,
+                      "chosen": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 6e6,
+                "cost_for_plan": 613022,
+                "chosen": true
+              }
+            ]
+          },
+          {
+            "attaching_conditions_to_tables": {
+              "original_condition": "((`lineitem`.`l_shipDATE` >= '1994-01-01') and (`lineitem`.`l_shipDATE` < ('1994-01-01' + interval '1' year)) and (`lineitem`.`l_discount` between (0.09 - 0.01) and (0.09 + 0.01)) and (`lineitem`.`l_quantity` < 24))",
+              "attached_conditions_computation": [
+              ],
+              "attached_conditions_summary": [
+                {
+                  "table": "`lineitem`",
+                  "attached": "((`lineitem`.`l_shipDATE` >= '1994-01-01') and (`lineitem`.`l_shipDATE` < ('1994-01-01' + interval '1' year)) and (`lineitem`.`l_discount` between (0.09 - 0.01) and (0.09 + 0.01)) and (`lineitem`.`l_quantity` < 24))"
+                }
+              ]
+            }
+          },
+          {
+            "optimizing_distinct_group_by_order_by": {
+            }
+          },
+          {
+            "refine_plan": [
+              {
+                "table": "`lineitem`"
+              }
+            ]
+          },
+          {
+            "considering_tmp_tables": [
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "join_execution": {
+        "select#": 1,
+        "steps": [
+        ]
+      }
+    }
+  ]
+}

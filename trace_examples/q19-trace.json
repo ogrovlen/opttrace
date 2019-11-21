@@ -1,0 +1,272 @@
+{
+  "steps": [
+    {
+      "join_preparation": {
+        "select#": 1,
+        "steps": [
+          {
+            "IN_uses_bisection": true
+          },
+          {
+            "IN_uses_bisection": true
+          },
+          {
+            "IN_uses_bisection": true
+          },
+          {
+            "IN_uses_bisection": true
+          },
+          {
+            "IN_uses_bisection": true
+          },
+          {
+            "IN_uses_bisection": true
+          },
+          {
+            "expanded_query": "/* select#1 */ select sum((`lineitem`.`l_extendedprice` * (1 - `lineitem`.`l_discount`))) AS `revenue` from `lineitem` join `part` where (((`part`.`p_partkey` = `lineitem`.`l_partkey`) and (`part`.`p_brand` = 'Brand#22') and (`part`.`p_container` in ('SM CASE','SM BOX','SM PACK','SM PKG')) and (`lineitem`.`l_quantity` >= 6) and (`lineitem`.`l_quantity` <= (6 + 10)) and (`part`.`p_size` between 1 and 5) and (`lineitem`.`l_shipmode` in ('AIR','AIR REG')) and (`lineitem`.`l_shipinstruct` = 'DELIVER IN PERSON')) or ((`part`.`p_partkey` = `lineitem`.`l_partkey`) and (`part`.`p_brand` = 'Brand#35') and (`part`.`p_container` in ('MED BAG','MED BOX','MED PKG','MED PACK')) and (`lineitem`.`l_quantity` >= 11) and (`lineitem`.`l_quantity` <= (11 + 10)) and (`part`.`p_size` between 1 and 10) and (`lineitem`.`l_shipmode` in ('AIR','AIR REG')) and (`lineitem`.`l_shipinstruct` = 'DELIVER IN PERSON')) or ((`part`.`p_partkey` = `lineitem`.`l_partkey`) and (`part`.`p_brand` = 'Brand#14') and (`part`.`p_container` in ('LG CASE','LG BOX','LG PACK','LG PKG')) and (`lineitem`.`l_quantity` >= 23) and (`lineitem`.`l_quantity` <= (23 + 10)) and (`part`.`p_size` between 1 and 15) and (`lineitem`.`l_shipmode` in ('AIR','AIR REG')) and (`lineitem`.`l_shipinstruct` = 'DELIVER IN PERSON')))"
+          }
+        ]
+      }
+    },
+    {
+      "join_optimization": {
+        "select#": 1,
+        "steps": [
+          {
+            "condition_processing": {
+              "condition": "WHERE",
+              "original_condition": "(((`part`.`p_partkey` = `lineitem`.`l_partkey`) and (`part`.`p_brand` = 'Brand#22') and (`part`.`p_container` in ('SM CASE','SM BOX','SM PACK','SM PKG')) and (`lineitem`.`l_quantity` >= 6) and (`lineitem`.`l_quantity` <= (6 + 10)) and (`part`.`p_size` between 1 and 5) and (`lineitem`.`l_shipmode` in ('AIR','AIR REG')) and (`lineitem`.`l_shipinstruct` = 'DELIVER IN PERSON')) or ((`part`.`p_partkey` = `lineitem`.`l_partkey`) and (`part`.`p_brand` = 'Brand#35') and (`part`.`p_container` in ('MED BAG','MED BOX','MED PKG','MED PACK')) and (`lineitem`.`l_quantity` >= 11) and (`lineitem`.`l_quantity` <= (11 + 10)) and (`part`.`p_size` between 1 and 10) and (`lineitem`.`l_shipmode` in ('AIR','AIR REG')) and (`lineitem`.`l_shipinstruct` = 'DELIVER IN PERSON')) or ((`part`.`p_partkey` = `lineitem`.`l_partkey`) and (`part`.`p_brand` = 'Brand#14') and (`part`.`p_container` in ('LG CASE','LG BOX','LG PACK','LG PKG')) and (`lineitem`.`l_quantity` >= 23) and (`lineitem`.`l_quantity` <= (23 + 10)) and (`part`.`p_size` between 1 and 15) and (`lineitem`.`l_shipmode` in ('AIR','AIR REG')) and (`lineitem`.`l_shipinstruct` = 'DELIVER IN PERSON')))",
+              "steps": [
+                {
+                  "transformation": "equality_propagation",
+                  "resulting_condition": "(((`part`.`p_container` in ('SM CASE','SM BOX','SM PACK','SM PKG')) and (`lineitem`.`l_quantity` >= 6) and (`lineitem`.`l_quantity` <= (6 + 10)) and (`part`.`p_size` between 1 and 5) and (`lineitem`.`l_shipmode` in ('AIR','AIR REG')) and multiple equal(`part`.`p_partkey`, `lineitem`.`l_partkey`) and multiple equal('Brand#22', `part`.`p_brand`) and multiple equal('DELIVER IN PERSON', `lineitem`.`l_shipinstruct`)) or ((`part`.`p_container` in ('MED BAG','MED BOX','MED PKG','MED PACK')) and (`lineitem`.`l_quantity` >= 11) and (`lineitem`.`l_quantity` <= (11 + 10)) and (`part`.`p_size` between 1 and 10) and (`lineitem`.`l_shipmode` in ('AIR','AIR REG')) and multiple equal(`part`.`p_partkey`, `lineitem`.`l_partkey`) and multiple equal('Brand#35', `part`.`p_brand`) and multiple equal('DELIVER IN PERSON', `lineitem`.`l_shipinstruct`)) or ((`part`.`p_container` in ('LG CASE','LG BOX','LG PACK','LG PKG')) and (`lineitem`.`l_quantity` >= 23) and (`lineitem`.`l_quantity` <= (23 + 10)) and (`part`.`p_size` between 1 and 15) and (`lineitem`.`l_shipmode` in ('AIR','AIR REG')) and multiple equal(`part`.`p_partkey`, `lineitem`.`l_partkey`) and multiple equal('Brand#14', `part`.`p_brand`) and multiple equal('DELIVER IN PERSON', `lineitem`.`l_shipinstruct`)))"
+                },
+                {
+                  "transformation": "constant_propagation",
+                  "resulting_condition": "(((`part`.`p_container` in ('SM CASE','SM BOX','SM PACK','SM PKG')) and (`lineitem`.`l_quantity` >= 6) and (`lineitem`.`l_quantity` <= (6 + 10)) and (`part`.`p_size` between 1 and 5) and (`lineitem`.`l_shipmode` in ('AIR','AIR REG')) and multiple equal(`part`.`p_partkey`, `lineitem`.`l_partkey`) and multiple equal('Brand#22', `part`.`p_brand`) and multiple equal('DELIVER IN PERSON', `lineitem`.`l_shipinstruct`)) or ((`part`.`p_container` in ('MED BAG','MED BOX','MED PKG','MED PACK')) and (`lineitem`.`l_quantity` >= 11) and (`lineitem`.`l_quantity` <= (11 + 10)) and (`part`.`p_size` between 1 and 10) and (`lineitem`.`l_shipmode` in ('AIR','AIR REG')) and multiple equal(`part`.`p_partkey`, `lineitem`.`l_partkey`) and multiple equal('Brand#35', `part`.`p_brand`) and multiple equal('DELIVER IN PERSON', `lineitem`.`l_shipinstruct`)) or ((`part`.`p_container` in ('LG CASE','LG BOX','LG PACK','LG PKG')) and (`lineitem`.`l_quantity` >= 23) and (`lineitem`.`l_quantity` <= (23 + 10)) and (`part`.`p_size` between 1 and 15) and (`lineitem`.`l_shipmode` in ('AIR','AIR REG')) and multiple equal(`part`.`p_partkey`, `lineitem`.`l_partkey`) and multiple equal('Brand#14', `part`.`p_brand`) and multiple equal('DELIVER IN PERSON', `lineitem`.`l_shipinstruct`)))"
+                },
+                {
+                  "transformation": "trivial_condition_removal",
+                  "resulting_condition": "(((`part`.`p_container` in ('SM CASE','SM BOX','SM PACK','SM PKG')) and (`lineitem`.`l_quantity` >= 6) and (`lineitem`.`l_quantity` <= (6 + 10)) and (`part`.`p_size` between 1 and 5) and (`lineitem`.`l_shipmode` in ('AIR','AIR REG')) and multiple equal(`part`.`p_partkey`, `lineitem`.`l_partkey`) and multiple equal('Brand#22', `part`.`p_brand`) and multiple equal('DELIVER IN PERSON', `lineitem`.`l_shipinstruct`)) or ((`part`.`p_container` in ('MED BAG','MED BOX','MED PKG','MED PACK')) and (`lineitem`.`l_quantity` >= 11) and (`lineitem`.`l_quantity` <= (11 + 10)) and (`part`.`p_size` between 1 and 10) and (`lineitem`.`l_shipmode` in ('AIR','AIR REG')) and multiple equal(`part`.`p_partkey`, `lineitem`.`l_partkey`) and multiple equal('Brand#35', `part`.`p_brand`) and multiple equal('DELIVER IN PERSON', `lineitem`.`l_shipinstruct`)) or ((`part`.`p_container` in ('LG CASE','LG BOX','LG PACK','LG PKG')) and (`lineitem`.`l_quantity` >= 23) and (`lineitem`.`l_quantity` <= (23 + 10)) and (`part`.`p_size` between 1 and 15) and (`lineitem`.`l_shipmode` in ('AIR','AIR REG')) and multiple equal(`part`.`p_partkey`, `lineitem`.`l_partkey`) and multiple equal('Brand#14', `part`.`p_brand`) and multiple equal('DELIVER IN PERSON', `lineitem`.`l_shipinstruct`)))"
+                }
+              ]
+            }
+          },
+          {
+            "substitute_generated_columns": {
+            }
+          },
+          {
+            "table_dependencies": [
+              {
+                "table": "`lineitem`",
+                "row_may_be_null": false,
+                "map_bit": 0,
+                "depends_on_map_bits": [
+                ]
+              },
+              {
+                "table": "`part`",
+                "row_may_be_null": false,
+                "map_bit": 1,
+                "depends_on_map_bits": [
+                ]
+              }
+            ]
+          },
+          {
+            "ref_optimizer_key_uses": [
+              {
+                "table": "`lineitem`",
+                "field": "l_partkey",
+                "equals": "`part`.`p_partkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`lineitem`",
+                "field": "l_partkey",
+                "equals": "`part`.`p_partkey`",
+                "null_rejecting": false
+              },
+              {
+                "table": "`part`",
+                "field": "p_partkey",
+                "equals": "`lineitem`.`l_partkey`",
+                "null_rejecting": true
+              }
+            ]
+          },
+          {
+            "rows_estimation": [
+              {
+                "table": "`lineitem`",
+                "table_scan": {
+                  "rows": 6001215,
+                  "cost": 12901
+                }
+              },
+              {
+                "table": "`part`",
+                "table_scan": {
+                  "rows": 200000,
+                  "cost": 489
+                }
+              }
+            ]
+          },
+          {
+            "considered_execution_plans": [
+              {
+                "plan_prefix": [
+                ],
+                "table": "`part`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "access_type": "ref",
+                      "index": "PRIMARY",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "rows_to_scan": 200000,
+                      "filtering_effect": [
+                      ],
+                      "final_filtering_effect": 0.0133,
+                      "access_type": "scan",
+                      "resulting_rows": 2654.6,
+                      "cost": 20489,
+                      "chosen": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 2654.6,
+                "cost_for_plan": 20489,
+                "rest_of_plan": [
+                  {
+                    "plan_prefix": [
+                      "`part`"
+                    ],
+                    "table": "`lineitem`",
+                    "best_access_path": {
+                      "considered_access_paths": [
+                        {
+                          "access_type": "ref",
+                          "index": "i_l_partkey_suppkey",
+                          "rows": 30.006,
+                          "cost": 27886,
+                          "chosen": true
+                        },
+                        {
+                          "access_type": "ref",
+                          "index": "i_l_partkey",
+                          "rows": 30.006,
+                          "cost": 27886,
+                          "chosen": false
+                        },
+                        {
+                          "rows_to_scan": 6001215,
+                          "filtering_effect": [
+                          ],
+                          "final_filtering_effect": 0.0067,
+                          "access_type": "scan",
+                          "using_join_cache": true,
+                          "buffers_needed": 1,
+                          "resulting_rows": 39911,
+                          "cost": 1.12e7,
+                          "chosen": false
+                        }
+                      ]
+                    },
+                    "condition_filtering_pct": 100,
+                    "rows_for_plan": 79653,
+                    "cost_for_plan": 48375,
+                    "chosen": true
+                  }
+                ]
+              },
+              {
+                "plan_prefix": [
+                ],
+                "table": "`lineitem`",
+                "best_access_path": {
+                  "considered_access_paths": [
+                    {
+                      "access_type": "ref",
+                      "index": "i_l_partkey_suppkey",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "access_type": "ref",
+                      "index": "i_l_partkey",
+                      "usable": false,
+                      "chosen": false
+                    },
+                    {
+                      "rows_to_scan": 6001215,
+                      "filtering_effect": [
+                      ],
+                      "final_filtering_effect": 0.0067,
+                      "access_type": "scan",
+                      "resulting_rows": 39911,
+                      "cost": 613022,
+                      "chosen": true
+                    }
+                  ]
+                },
+                "condition_filtering_pct": 100,
+                "rows_for_plan": 39911,
+                "cost_for_plan": 613022,
+                "pruned_by_cost": true
+              }
+            ]
+          },
+          {
+            "attaching_conditions_to_tables": {
+              "original_condition": "(((`lineitem`.`l_shipinstruct` = 'DELIVER IN PERSON') and (`part`.`p_brand` = 'Brand#22') and (`lineitem`.`l_partkey` = `part`.`p_partkey`) and (`part`.`p_container` in ('SM CASE','SM BOX','SM PACK','SM PKG')) and (`lineitem`.`l_quantity` >= 6) and (`lineitem`.`l_quantity` <= (6 + 10)) and (`part`.`p_size` between 1 and 5) and (`lineitem`.`l_shipmode` in ('AIR','AIR REG'))) or ((`lineitem`.`l_shipinstruct` = 'DELIVER IN PERSON') and (`part`.`p_brand` = 'Brand#35') and (`lineitem`.`l_partkey` = `part`.`p_partkey`) and (`part`.`p_container` in ('MED BAG','MED BOX','MED PKG','MED PACK')) and (`lineitem`.`l_quantity` >= 11) and (`lineitem`.`l_quantity` <= (11 + 10)) and (`part`.`p_size` between 1 and 10) and (`lineitem`.`l_shipmode` in ('AIR','AIR REG'))) or ((`lineitem`.`l_shipinstruct` = 'DELIVER IN PERSON') and (`part`.`p_brand` = 'Brand#14') and (`lineitem`.`l_partkey` = `part`.`p_partkey`) and (`part`.`p_container` in ('LG CASE','LG BOX','LG PACK','LG PKG')) and (`lineitem`.`l_quantity` >= 23) and (`lineitem`.`l_quantity` <= (23 + 10)) and (`part`.`p_size` between 1 and 15) and (`lineitem`.`l_shipmode` in ('AIR','AIR REG'))))",
+              "attached_conditions_computation": [
+              ],
+              "attached_conditions_summary": [
+                {
+                  "table": "`part`",
+                  "attached": "(((`part`.`p_brand` = 'Brand#22') and (`part`.`p_container` in ('SM CASE','SM BOX','SM PACK','SM PKG')) and (`part`.`p_size` between 1 and 5)) or ((`part`.`p_brand` = 'Brand#35') and (`part`.`p_container` in ('MED BAG','MED BOX','MED PKG','MED PACK')) and (`part`.`p_size` between 1 and 10)) or ((`part`.`p_brand` = 'Brand#14') and (`part`.`p_container` in ('LG CASE','LG BOX','LG PACK','LG PKG')) and (`part`.`p_size` between 1 and 15)))"
+                },
+                {
+                  "table": "`lineitem`",
+                  "attached": "(((`lineitem`.`l_shipinstruct` = 'DELIVER IN PERSON') and (`part`.`p_brand` = 'Brand#22') and (`part`.`p_container` in ('SM CASE','SM BOX','SM PACK','SM PKG')) and (`lineitem`.`l_quantity` >= 6) and (`lineitem`.`l_quantity` <= (6 + 10)) and (`part`.`p_size` between 1 and 5) and (`lineitem`.`l_shipmode` in ('AIR','AIR REG'))) or ((`lineitem`.`l_shipinstruct` = 'DELIVER IN PERSON') and (`part`.`p_brand` = 'Brand#35') and (`part`.`p_container` in ('MED BAG','MED BOX','MED PKG','MED PACK')) and (`lineitem`.`l_quantity` >= 11) and (`lineitem`.`l_quantity` <= (11 + 10)) and (`part`.`p_size` between 1 and 10) and (`lineitem`.`l_shipmode` in ('AIR','AIR REG'))) or ((`lineitem`.`l_shipinstruct` = 'DELIVER IN PERSON') and (`part`.`p_brand` = 'Brand#14') and (`part`.`p_container` in ('LG CASE','LG BOX','LG PACK','LG PKG')) and (`lineitem`.`l_quantity` >= 23) and (`lineitem`.`l_quantity` <= (23 + 10)) and (`part`.`p_size` between 1 and 15) and (`lineitem`.`l_shipmode` in ('AIR','AIR REG'))))"
+                }
+              ]
+            }
+          },
+          {
+            "optimizing_distinct_group_by_order_by": {
+            }
+          },
+          {
+            "refine_plan": [
+              {
+                "table": "`part`"
+              },
+              {
+                "table": "`lineitem`"
+              }
+            ]
+          },
+          {
+            "considering_tmp_tables": [
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "join_execution": {
+        "select#": 1,
+        "steps": [
+        ]
+      }
+    }
+  ]
+}
