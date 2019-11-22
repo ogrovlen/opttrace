@@ -239,6 +239,11 @@ No trace for greedy search!
 
 ======================================================
 
+select#2:
+Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
+--------------------------------------------------------
+`t1` scan 500/51.11 500/51.11 *** NEW BEST PLAN ***
+
 select#1:
 Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
 --------------------------------------------------------
@@ -247,6 +252,11 @@ Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
 
 ======================================================
 
+select#2:
+Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
+--------------------------------------------------------
+`t1` scan 500/51.11 500/51.11 *** NEW BEST PLAN ***
+
 select#1:
 Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
 --------------------------------------------------------
@@ -254,6 +264,16 @@ Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
 
 
 ======================================================
+
+select#2:
+Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
+--------------------------------------------------------
+`t1` scan 500/51.11 500/51.11 *** NEW BEST PLAN ***
+
+select#3:
+Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
+--------------------------------------------------------
+`t1` scan 500/51.11 500/51.11 *** NEW BEST PLAN ***
 
 select#1:
 Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
@@ -304,6 +324,11 @@ Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
 
 ======================================================
 
+select#2:
+Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
+--------------------------------------------------------
+`t1` scan 500/51.11 500/51.11 *** NEW BEST PLAN ***
+
 select#1:
 Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
 --------------------------------------------------------
@@ -311,6 +336,11 @@ Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
 
 
 ======================================================
+
+select#2:
+Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
+--------------------------------------------------------
+`t1` scan 500/51.11 500/51.11 *** NEW BEST PLAN ***
 
 select#1:
 Table AccessType:IndexName Rows/Cost TotalRows/TotalCost

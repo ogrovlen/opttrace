@@ -762,6 +762,11 @@ Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
 
 ======================================================
 
+select#2:
+Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
+--------------------------------------------------------
+`t1` scan 3/0.8126 1/0.8126 *** NEW BEST PLAN ***
+
 select#1:
 Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
 --------------------------------------------------------

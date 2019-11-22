@@ -57,6 +57,18 @@ No trace for greedy search!
 
 ======================================================
 
+select#2:
+No trace for greedy search!
+
+select#3:
+No trace for greedy search!
+
+select#4:
+No trace for greedy search!
+
+select#5:
+No trace for greedy search!
+
 select#1:
 Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
 --------------------------------------------------------

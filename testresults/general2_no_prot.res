@@ -66,6 +66,11 @@ Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
 
 ======================================================
 
+select#2:
+Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
+--------------------------------------------------------
+`t1` scan 3/0.8016 3/0.8016 Sort cost: 3 Total cost: 3.8016 *** NEW BEST PLAN ***
+
 select#1:
 Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
 --------------------------------------------------------
@@ -179,6 +184,13 @@ Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
 
 
 ======================================================
+
+select#2:
+Table AccessType:IndexName Rows/Cost TotalRows/TotalCost
+--------------------------------------------------------
+(`t1` const)
+`t3` eq_ref:t3_ID_IDX 1/0.1 1/0.1
+  `t2` eq_ref:t2_ID_IDX 1/0.1 1/0.2 eq_ref-extended *** NEW BEST PLAN ***
 
 select#1:
 Table AccessType:IndexName Rows/Cost TotalRows/TotalCost

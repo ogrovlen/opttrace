@@ -7,29 +7,36 @@ function processTrace(trace)
     var jsonTrace = JSON.parse(trace);
 
     var optSteps = null;
-    var select = null;
+    var selectno = null;
     var output = "";
     for (var i = 0; i < jsonTrace.steps.length; i++) {
         if (jsonTrace.steps[i].join_optimization) {
-            output += "select#" +
-                jsonTrace.steps[i].join_optimization["select#"] + ":\n";
+	    selectno = jsonTrace.steps[i].join_optimization["select#"];
             optSteps = jsonTrace.steps[i].join_optimization.steps;
-            output = processSelect(optSteps, output);
+            output = processSelect(optSteps, selectno, output);
             output += "\n";
         }
     }
     return output;
 }
 
-function processSelect(optSteps, output)
+function processSelect(optSteps, selectno, output)
 {
     var execPlans = null;
     for (var i = 0; i < optSteps.length; i++) {
+	if (optSteps[i].join_optimization) {  // Materialized derived table
+	    derivedno = optSteps[i].join_optimization["select#"];
+            recursiveSteps = optSteps[i].join_optimization.steps;
+	    output = processSelect(recursiveSteps, derivedno, output);
+	    output += "\n";
+	}
         if (optSteps[i].considered_execution_plans) {
             execPlans = optSteps[i].considered_execution_plans;
             break;
         }
     }
+
+    output += "select#" + selectno + ":\n";
 
     if (!execPlans || execPlans == "...") {
         output += "No trace for greedy search!\n";
