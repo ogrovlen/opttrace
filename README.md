@@ -35,7 +35,7 @@ subdirectory and compare the output with pre-recorded results.
 
 Usage:
 ```
-optracetest [-r] [tracefile ...]
+opttracetest [-r] [tracefile ...]
 ```
 
 `-r` records the current results
